@@ -10,6 +10,13 @@ We need to write a basic compiler for the root language using an existing langua
 Then, we can use that "cross-compiler" to compile our kernel.
 Once the OS is running, we rewrite the compiler in the cusom language so it can compile itself in the OS.
 
+#### Progress
+We have added `main.py`, `lexer.py`, and a very basic `main.jc`.
+To run the compiler for `main.jc`, run:
+```bash
+vishesh@vishesh-fedora:~/[PATH_TO_PROJECT_ROOT]$ python OS/compiler/main.py OS/kernel/main.jc
+```
+
 ### Stage 1
 We need to communicate to the BIOS (or UEFI) with a bootloader.
 However, we need either x86_64 or ARM.
