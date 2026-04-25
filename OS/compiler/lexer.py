@@ -2,6 +2,7 @@ import re
 
 # Define JinX-C syntax
 TOKEN_SPEC = [
+    ("COMMENT", r"//.*"),  # Comments
     ("KEYWORD", r"\b(func|u32|u8|ptr|return|var)\b"),  # Language reserved words
     ("NUMBER", r"0x[0-9a-fA-F]+|\d+"),  # Hex (0x10) or Decimal (10)
     ("IDENTIFIER", r"[a-zA-Z_][a-zA-Z0-9_]*"),  # Variable/Function names
@@ -22,7 +23,7 @@ def lex(code):
         kind = mo.lastgroup
         value = mo.group()
 
-        if kind == "SKIP":
+        if kind == "SKIP" or kind == "COMMENT":  # Ignore comments just like spaces
             continue
         elif kind == "MISMATCH":
             raise SyntaxError(f"Unexpected character: {value}")
