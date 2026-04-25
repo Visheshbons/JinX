@@ -1,0 +1,6 @@
+// kernel/main.jc
+// JC is JinX's C
+
+func k_main() {
+    // This is where JinX begins
+}
