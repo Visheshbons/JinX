@@ -9,4 +9,8 @@ However, everything in the OS will be made from scratch, with a completely custo
 This is **not** a Build Your Own Linux project, as we will not neccecarily be using Linux systems.
 
 
+## Documentation
+- [JinX-C (JC) Documentation](./JinX-C_Documentation.md)
+- [JinX Assembly (JASM) Documentation](./JASM_Documentation.md)
+
 Copyright © 2026. All rights reserved.
