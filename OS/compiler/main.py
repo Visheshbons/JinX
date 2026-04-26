@@ -1,6 +1,7 @@
 import os
 import sys
 
+from generator import Generator  # generator.py
 from lexer import lex  # lexer.py
 from parser import Parser  # parser.py
 
@@ -41,7 +42,21 @@ def build_jinx(source_file):
 
     print("\nCompilation successful!")
 
-    # Step 3: Machine Code Generation (Todo)
+    # Step 3: Machine Code Generation
+    print("\nStarting JASM generation...")
+    from generator import Generator
+
+    gen = Generator(ast)
+    jasm_code = gen.generate()
+
+    # Save to file
+    out_file = source_file.replace(".jc", ".jasm")
+    with open(out_file, "w") as f:
+        f.write(jasm_code)
+
+    print(f"\nSuccess! Wrote JASM to {out_file}")
+    print("--- Output ---")
+    print(jasm_code)
 
 
 if __name__ == "__main__":

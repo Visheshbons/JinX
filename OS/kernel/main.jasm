@@ -1,0 +1,10 @@
+
+global k_main
+k_main:
+  push rbp
+  mov rbp, rsp
+  ; u32 screen = 0xB8000;
+  mov dword [rbp-4], 0xB8000
+  mov rsp, rbp
+  pop rbp
+  ret
