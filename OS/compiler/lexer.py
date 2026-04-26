@@ -1,16 +1,17 @@
+# Define JinX-C syntax
 import re
 
-# Define JinX-C syntax
 TOKEN_SPEC = [
-    ("COMMENT", r"//.*"),  # Comments
-    ("KEYWORD", r"\b(func|u32|u8|ptr|return|var)\b"),  # Language reserved words
-    ("NUMBER", r"0x[0-9a-fA-F]+|\d+"),  # Hex (0x10) or Decimal (10)
-    ("IDENTIFIER", r"[a-zA-Z_][a-zA-Z0-9_]*"),  # Variable/Function names
-    ("OPERATOR", r"[=+*/-]"),  # Math and Assignment
-    ("PUNCTUATION", r"[;(){}\[\]]"),  # Brackets, semicolons
-    ("STRING", r'"[^"]*"'),  # "Hello World"
-    ("SKIP", r"[ \t\n]+"),  # Spaces and Newlines
-    ("MISMATCH", r"."),  # Anything else (Error)
+    ("COMMENT", r"//.*"),
+    ("INCLUDE", r"#include\s+<[^>]+>"),
+    ("KEYWORD", r"\b(func|u32|u8|ptr|str|bool|return|var|if|while|true|false)\b"),
+    ("NUMBER", r"0x[0-9a-fA-F]+|\d+"),
+    ("IDENTIFIER", r"[a-zA-Z_][a-zA-Z0-9_]*"),
+    ("OPERATOR", r"[=+*/-]|==|!=|<=|>="),
+    ("PUNCTUATION", r"[;(){}\[\]]"),
+    ("STRING", r'"[^"]*"'),
+    ("SKIP", r"[ \t\n]+"),
+    ("MISMATCH", r"."),
 ]
 
 

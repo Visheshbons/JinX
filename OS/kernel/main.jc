@@ -3,4 +3,5 @@
 
 func k_main() {
     // This is where JinX begins
+    u32 screen = 0xB8000;
 }

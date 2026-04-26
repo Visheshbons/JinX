@@ -2,11 +2,11 @@ import os
 import sys
 
 from lexer import lex  # lexer.py
+from parser import Parser  # parser.py
 
 
 def build_jinx(source_file):
     print(f"--- JinX-C Compiler ---")
-    print(f"Reading {source_file}...")
 
     # Check if file exists before trying to open it
     if not os.path.exists(source_file):
@@ -28,10 +28,20 @@ def build_jinx(source_file):
         print(f"Lexer Error: {e}")
         return
 
-    # Step 2: Parsing (Todo)
-    # Step 3: Machine Code Generation (Todo)
+    # Step 2: Parsing
+    parser = Parser(tokens)
+    try:
+        ast = parser.parse()
+        print("\nAST generated successfully:")
+        for node in ast:
+            print(f"  {node}")
+    except Exception as e:
+        print(f"Parser Error: {e}")
+        return
 
-    print("\nCompilation successful! (Placeholder)")
+    print("\nCompilation successful!")
+
+    # Step 3: Machine Code Generation (Todo)
 
 
 if __name__ == "__main__":
