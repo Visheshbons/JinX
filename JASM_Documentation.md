@@ -14,7 +14,7 @@ Current flow in this repository:
 JC source (.jc) -> lexer.py -> parser.py AST -> generator.py -> JASM (.jasm)
 ```
 
-`OS/compiler/main.py` now writes a `.jasm` file next to the input `.jc` file after parsing succeeds.
+`OS/compiler/main.py` now writes a `.jasm` file next to the input `.jc` file after parsing and JASM generation succeed.
 
 ---
 
