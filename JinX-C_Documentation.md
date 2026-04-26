@@ -140,10 +140,10 @@ Supported initializer token categories are currently:
 ```
 
 ### Operators (tokenized)
-The lexer tokenizes operators such as:
+The lexer currently tokenizes single-character operators such as:
 - `=` `+` `-` `*` `/`
-- `==` `!=` `<=` `>=`
 
+Multi-character comparison operators like `==`, `!=`, `<=`, and `>=` are not currently tokenized as single operators by the current compiler implementation.
 > Tokenization support does not automatically mean full semantic/codegen support yet.
 
 ---
