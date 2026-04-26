@@ -1,7 +1,7 @@
 // kernel/main.jc
 // JC is JinX's C
 
-func k_main() {
+func k_main() u32 {
     // This is where JinX begins
     u32 screen = 0xB8000;
 }

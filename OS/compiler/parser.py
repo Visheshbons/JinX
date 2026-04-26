@@ -45,6 +45,18 @@ class Parser:
         self.consume("KEYWORD")  # func
         name = self.consume("IDENTIFIER")[1]
         self.consume("PUNCTUATION")  # (
+
+        args = []
+        # Keep parsing until we hit the closing parenthesis
+        while self.peek() and self.peek()[1] != ")":
+            arg_type = self.consume("KEYWORD")[1]  # e.g., 'u8'
+            arg_name = self.consume("IDENTIFIER")[1]  # e.g., 'c'
+            args.append({"type": arg_type, "name": arg_name})
+
+            # If you support multiple args like (u8 x, u8 y), you'd consume commas here:
+            if self.peek() and self.peek()[1] == ",":
+                self.consume("PUNCTUATION")  # Consume the comma
+
         self.consume("PUNCTUATION")  # )
 
         # return type comes after the parens
@@ -78,7 +90,10 @@ class Parser:
         var_type = self.consume("KEYWORD")[1]
         var_name = self.consume("IDENTIFIER")[1]
         self.consume("OPERATOR")  # =
-        value = self.consume()[1]  # The value (e.g., 0xB8000)
+        value_token = self.consume()
+        if value_token[0] not in ["NUMBER", "STRING", "IDENTIFIER"]:
+            raise SyntaxError(f"Expected a value, got {value_token[0]}")
+        value = value_token[1]
         self.consume("PUNCTUATION")  # ;
         return Node(
             "VAR_DECL", value={"type": var_type, "name": var_name, "init": value}
