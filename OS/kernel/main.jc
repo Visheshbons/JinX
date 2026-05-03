@@ -1,7 +1,14 @@
 // kernel/main.jc
 // JC is JinX's C
 
+#include <stdio.jc>
+
 func k_main() u32 {
     // This is where JinX begins
-    u32 screen = 0xB8000;
+    ptr screen = 0xB8000;
+    u32 status = 0;
+
+    println("Kernel loaded")
+
+    return status;
 }

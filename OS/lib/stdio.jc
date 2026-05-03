@@ -1,9 +1,17 @@
 // Internal JinX-C function to print a single character
 func putchar(u8 c) {
     ptr vga = 0xB8000;
-    // w.i.p.
+    u8 attr = 0x07;
+    u8 lo = c;
+    u8 hi = attr;
 }
 
 func println(str text) {
-    // Logic to loop through 'text' and call putchar()
+    u8 i = 0;
+    while (true) {
+        u8 c = text[i];
+        if (c == 0) {}
+        putchar(c);
+        i = i + 1
+    }
 }
