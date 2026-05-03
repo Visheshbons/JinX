@@ -10,6 +10,8 @@
     #include <windows.h>
 #endif
 
+extern struct Flags Condition;
+
 class JinXVM {
     private:
         unsigned char* Memory;
@@ -17,6 +19,8 @@ class JinXVM {
         int Registers[8];
         int ProgramCounter;
         bool Running;
+        int StackPointer;
+        bool IsInverted;
     public:
         JinXVM(int Size);
         ~JinXVM();

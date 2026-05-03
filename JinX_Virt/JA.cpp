@@ -14,10 +14,20 @@ std::map<std::string, uint8_t> OperationCodes = {
     {"ADDI", 0x12},
     {"JUMP", 0x20},
     {"JUMP_IF_ZERO", 0x21},
+    {"NOT", 0x22},
     {"OUTPUT", 0x30},
     {"WRITE", 0x40},
     {"READ", 0x41},
-    {"READ_KEY", 0x60}
+    {"READ_KEY", 0x60},
+    {"PUSH", 0x70},
+    {"POP", 0x71},
+    {"CALL", 0x72},
+    {"RETURN", 0x73},
+    {"CMP", 0x80},
+    {"JUMP_IF_EQ", 0x81},
+    {"JUMP_IF_LT", 0x82},
+    {"JUMP_IF_GT", 0x83},
+    {"LEA", 0x90}
 };
 
 std::vector<uint8_t> Bytecode;
@@ -142,7 +152,6 @@ void FirstPass(const std::vector<std::string>& Lines) {
             if (Labels.find(Label) != Labels.end()) {
                 std::cerr << "Error: Duplicate label of " << Label << " found" << std::endl;
             }
-
             Labels[Label] = Address;
             continue;
         }
@@ -151,15 +160,22 @@ void FirstPass(const std::vector<std::string>& Lines) {
         std::string OperationCode = (Space == std::string::npos) ? Trimmed : Trimmed.substr(0, Space);
 
         if (OperationCode == "HALT") Address += 1;
+        else if (OperationCode == "RETURN") Address += 1;
+        else if (OperationCode == "NOT") Address += 1;
         else if (OperationCode == "OUTPUT") Address += 2;
         else if (OperationCode == "READ_KEY") Address += 2;
+        else if (OperationCode == "PUSH" || OperationCode == "POP") Address += 2;
         else if (OperationCode == "MOV8") Address += 3;
         else if (OperationCode == "ADD" || OperationCode == "SUB") Address += 3;
-        else if (OperationCode == "ADDI") Address += 4;
+        else if (OperationCode == "CMP") Address += 3;
+        else if (OperationCode == "ADDI") Address += 3;
+        else if (OperationCode == "CALL") Address += 5;
         else if (OperationCode == "JUMP") Address += 5;
-        else if (OperationCode == "JUMP_ZERO") Address += 6;
+        else if (OperationCode == "JUMP_IF_EQ" || OperationCode == "JUMP_IF_LT" || OperationCode == "JUMP_IF_GT") Address += 5;
+        else if (OperationCode == "JUMP_IF_ZERO") Address += 6;
         else if (OperationCode == "READ" || OperationCode == "WRITE") Address += 6;
         else if (OperationCode == "MOV32") Address += 6;
+        else if (OperationCode == "LEA") Address += 6;
     }
 }
 
@@ -185,6 +201,12 @@ void AssembleLine(const std::string& Line, uint32_t& PC) {
 
     if (OperationCode == "HALT") {
         WriteByte(OperationCodes["HALT"]);
+        PC += 1;
+    } else if (OperationCode == "RETURN") {
+        WriteByte(OperationCodes["RETURN"]);
+        PC += 1;
+    } else if (OperationCode == "NOT") {
+        WriteByte(OperationCodes["NOT"]);
         PC += 1;
     } else if (OperationCode == "OUTPUT") {
         int Register = ParseRegister(Rest);
@@ -218,6 +240,23 @@ void AssembleLine(const std::string& Line, uint32_t& PC) {
         WriteByte(OperationCodes["MOV8"]);
         WriteByte(Register);
         WriteByte(Value);
+        PC += 3;
+    } else if (OperationCode == "CMP") {
+        size_t Comma = Rest.find(',');
+        if (Comma == std::string::npos) {
+            std::cerr << "Error: CMP requires syntax <destination>, <source>" << std::endl;
+            return;
+        }
+        
+        std::string DestinationString = Trim(Rest.substr(0, Comma));
+        std::string SourceString = Trim(Rest.substr(Comma + 1));
+        
+        int Destination = ParseRegister(DestinationString);
+        int Source = ParseRegister(SourceString);
+        
+        WriteByte(OperationCodes["CMP"]);
+        WriteByte(Destination);
+        WriteByte(Source);
         PC += 3;
     } else if (OperationCode == "MOV32") {
         size_t Comma = Rest.find(',');
@@ -267,7 +306,12 @@ void AssembleLine(const std::string& Line, uint32_t& PC) {
         WriteByte(Destination);
         WriteByte(Value);
         PC += 3;
-    } else if (OperationCode == "JUMP") {
+    } else if (OperationCode == "PUSH" || OperationCode == "POP") {
+        int Register = ParseRegister(Rest);
+        WriteByte(OperationCodes[OperationCode]);
+        WriteByte(Register);
+        PC += 2;
+    } else if (OperationCode == "JUMP" || OperationCode == "JUMP_IF_EQ" || OperationCode == "JUMP_IF_LT" || OperationCode == "JUMP_IF_GT") {
         std::string AddressString = Trim(Rest);
 
         size_t CommentPosition = AddressString.find(';');
@@ -286,7 +330,14 @@ void AssembleLine(const std::string& Line, uint32_t& PC) {
             Address = ParseValue(AddressString);
         }
 
-        WriteByte(OperationCodes["JUMP"]);
+        WriteByte(OperationCodes[OperationCode]);
+        WriteByte32(Address);
+        PC += 5;
+    } else if (OperationCode == "CALL") {
+        std::string AddressString = Trim(Rest);
+        uint32_t Address = (Labels.find(AddressString) != Labels.end()) ? Labels[AddressString] : ParseValue(AddressString);
+
+        WriteByte(OperationCodes["CALL"]);
         WriteByte32(Address);
         PC += 5;
     } else if (OperationCode == "JUMP_IF_ZERO") {
@@ -339,6 +390,18 @@ void AssembleLine(const std::string& Line, uint32_t& PC) {
         WriteByte(OperationCodes[OperationCode]);
         WriteByte32(Address);
         WriteByte(Register);
+        PC += 6;
+    } else if (OperationCode == "LEA") {
+        size_t Comma = Rest.find(',');
+        std::string RegisterString = Trim(Rest.substr(0, Comma));
+        std::string AddressString = Trim(Rest.substr(Comma + 1));
+
+        int Register = ParseRegister(RegisterString);
+        uint32_t Address = (Labels.find(AddressString) != Labels.end()) ? Labels[AddressString] : ParseValue(AddressString);
+
+        WriteByte(OperationCodes["LEA"]);
+        WriteByte(Register);
+        WriteByte32(Address);
         PC += 6;
     }
 }

@@ -1,19 +1,15 @@
-; task.ja - Reads 5 characters as a test program
-MOV8 R0, 0
-JUMP Loop
+; simple.ja - Should print 'Y'
+MOV8 R0, 5
+MOV8 R1, 5
+CMP R0, R1
+JUMP_IF_EQ print_y
+MOV8 R0, 'N'
+OUTPUT R0
+JUMP done
 
-Loop:
-    READ_KEY R1
-    OUTPUT R1
-    
-    MOV8 R2, 1
-    ADD R0, R2        ; Counter++
-    
-    MOV8 R2, 5
-    SUB R2, R0
-    JUMP_IF_ZERO R2, End
-    
-    JUMP Loop
-
-End:
+print_y:
+    MOV8 R0, 'Y'
+    OUTPUT R0
+    JUMP done
+done:
     HALT
