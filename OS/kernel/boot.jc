@@ -1,0 +1,16 @@
+// Boot entry point
+func boot() u32 {
+    // MEMORY
+    ptr stack = 0x7C00;
+    ptr heap = 0x10000;
+    ptr screen = 0xB8000;
+
+    // Hardware link
+    u32 port_pic1 = 0x20;
+    u32 port_pic2 = 0xA0;
+    u32 port_kb = 0x60;
+
+    // Boot status
+    u32 status = 0;
+    u32 magoc = 0x1BADB002; // Multiboot magic number for grub
+}
