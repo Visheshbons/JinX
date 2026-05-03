@@ -44,7 +44,6 @@ def build_jinx(source_file):
 
     # Step 3: Machine Code Generation
     print("\nStarting JASM generation...")
-    from generator import Generator
 
     gen = Generator(ast)
     jasm_code = gen.generate()

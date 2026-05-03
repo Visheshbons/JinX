@@ -4,28 +4,36 @@ This file will contain the rough outline for how the OS will be built.
 Current TREE:
 ```
 .
+├── JASM_Documentation.md
 ├── JinX-C_Documentation.md
 ├── OS
 │   ├── bin
 │   ├── build_scripts
 │   ├── compiler
+│   │   ├── Core.cpp
 │   │   ├── generator.py
+│   │   ├── JA.cpp
+│   │   ├── JinXVirtual.cpp
+│   │   ├── JinXVirtual.h
 │   │   ├── lexer.py
 │   │   ├── main.py
 │   │   ├── parser.py
 │   │   └── __pycache__
+│   │       ├── generator.cpython-314.pyc
 │   │       ├── lexer.cpython-314.pyc
 │   │       └── parser.cpython-314.pyc
 │   ├── kernel
 │   │   ├── boot.jc
 │   │   ├── drivers
-│   │   └── main.jc
+│   │   ├── main.jasm
+│   │   ├── main.jc
+│   │   └── task.ja
 │   └── lib
 │       └── stdio.jc
 ├── plan.md
 └── README.md
 
-9 directories, 12 files
+9 directories, 20 files
 ```
 
 ## STAGES
