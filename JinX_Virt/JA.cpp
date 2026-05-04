@@ -28,7 +28,6 @@ std::map<std::string, uint8_t> OperationCodes = {
     {"JUMP_IF_LT", 0x82},
     {"JUMP_IF_GT", 0x83},
     {"LEA", 0x90},
-    {"DB", 0x91}
 };
 
 std::vector<uint8_t> Bytecode;
@@ -166,21 +165,7 @@ void FirstPass(const std::vector<std::string>& Lines) {
         else if (OperationCode == "OUTPUT") Address += 2;
         else if (OperationCode == "READ_KEY") Address += 2;
         else if (OperationCode == "PUSH" || OperationCode == "POP") Address += 2;
-        else if (OperationCode == "DB") {
-            std::string Values = (Space == std::string::npos) ? "" : Trim(Trimmed.substr(Space + 1));
-    
-            int ByteCount = 0;
-            if (!Values.empty()) {
-                size_t Position = 0;
-                while ((Position = Values.find(',')) != std::string::npos) {
-                    ByteCount++;
-                    Values = Values.substr(Position + 1);
-                }
-                ByteCount++;
-            }
-            
-            Address += 2 + ByteCount;
-        } else if (OperationCode == "MOV8") Address += 3;
+        else if (OperationCode == "MOV8") Address += 3;
         else if (OperationCode == "ADD" || OperationCode == "SUB") Address += 3;
         else if (OperationCode == "CMP") Address += 3;
         else if (OperationCode == "ADDI") Address += 3;
@@ -343,12 +328,10 @@ void AssembleLine(const std::string& Line, uint32_t& PC) {
             Bytes.push_back(ParseValue(ValueTryParse));
         }
         
-        WriteByte(OperationCodes["DB"]);
-        WriteByte(Bytes.size());
         for (int Byte : Bytes) {
             WriteByte(Byte & 0xFF);
         }
-        PC += 2 + Bytes.size();
+        PC += Bytes.size();
     } else if (OperationCode == "JUMP" || OperationCode == "JUMP_IF_EQ" || OperationCode == "JUMP_IF_LT" || OperationCode == "JUMP_IF_GT") {
         std::string AddressString = Trim(Rest);
 

@@ -10,6 +10,7 @@ print:
     JUMP print
 done:
     RETURN
+    HALT
 
 message:
     DB 'H', 'e', 'l', 'l', 'o', ' ', 'W', 'o', 'r', 'l', 'd', '!', 10, 0
