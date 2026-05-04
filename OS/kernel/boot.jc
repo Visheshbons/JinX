@@ -2,7 +2,7 @@
 
 #include <stdio.jc>
 
-func boot() u32 {
+u32 boot() {
     // MEMORY
     ptr stack = 0x7C00;
     ptr heap = 0x10000;

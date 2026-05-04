@@ -3,7 +3,7 @@
 
 #include <stdio.jc>
 
-func k_main() u32 {
+u32 k_main() {
     // This is where JinX begins
     ptr screen = 0xB8000;
     u32 status = 0;
