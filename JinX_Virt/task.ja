@@ -1,15 +1,13 @@
-; simple.ja - Should print 'Y'
-MOV8 R0, 5
-MOV8 R1, 5
-CMP R0, R1
-JUMP_IF_EQ print_y
-MOV8 R0, 'N'
-OUTPUT R0
-JUMP done
+MOV8 R0, 0
+JUMP Key
 
-print_y:
-    MOV8 R0, 'Y'
-    OUTPUT R0
-    JUMP done
-done:
+Key:
+    MOV8 R1, 5
+    READ_KEY R2
+    ADDI R0, 1
+    SUB R1, R0
+
+    JUMP_IF_ZERO R1, Escape
+    JUMP Key
+Escape:
     HALT
