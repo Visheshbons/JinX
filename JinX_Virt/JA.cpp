@@ -167,17 +167,18 @@ void FirstPass(const std::vector<std::string>& Lines) {
         else if (OperationCode == "READ_KEY") Address += 2;
         else if (OperationCode == "PUSH" || OperationCode == "POP") Address += 2;
         else if (OperationCode == "DB") {
+            std::string Values = (Space == std::string::npos) ? "" : Trim(Trimmed.substr(Space + 1));
+    
             int ByteCount = 0;
-            size_t Position = 0;
-            std::string Rest = (Space == std::string::npos) ? "" : Trim(Trimmed.substr(Space + 1));
-            std::string Values = Rest;
-            
-            while ((Position = Values.find(',') != std::string::npos)) {
+            if (!Values.empty()) {
+                size_t Position = 0;
+                while ((Position = Values.find(',')) != std::string::npos) {
+                    ByteCount++;
+                    Values = Values.substr(Pos + 1);
+                }
                 ByteCount++;
-                Values = Values.substr(Position + 1);
             }
-
-            ByteCount++;
+            
             Address += 2 + ByteCount;
         } else if (OperationCode == "MOV8") Address += 3;
         else if (OperationCode == "ADD" || OperationCode == "SUB") Address += 3;
@@ -327,24 +328,24 @@ void AssembleLine(const std::string& Line, uint32_t& PC) {
         PC += 2;
     } else if (OperationCode == "DB") {
         std::vector<int> Bytes;
-        size_t Position = 0;
         std::string Values = Rest;
-
+        size_t Position = 0;
+        
         while ((Position = Values.find(',')) != std::string::npos) {
             std::string Value = Trim(Values.substr(0, Position));
             Bytes.push_back(ParseValue(Value));
             Values = Values.substr(Position + 1);
         }
 
-        std::string TrimRest = Trim(Rest);
-        Bytes.push_back(ParseValue(TrimRest));
+        if (!Values.empty()) {
+            Bytes.push_back(ParseValue(Trim(Values)));
+        }
+        
         WriteByte(OperationCodes["DB"]);
         WriteByte(Bytes.size());
-        
-        for (auto& Byte : Bytes) {
+        for (int Byte : Bytes) {
             WriteByte(Byte & 0xFF);
         }
-
         PC += 2 + Bytes.size();
     } else if (OperationCode == "JUMP" || OperationCode == "JUMP_IF_EQ" || OperationCode == "JUMP_IF_LT" || OperationCode == "JUMP_IF_GT") {
         std::string AddressString = Trim(Rest);
