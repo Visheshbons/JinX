@@ -321,6 +321,11 @@ void JinXVM::Run() {
                 Registers[RegisterIndex] = Address;
                 break;
             }
+            case 0x91: {
+                int Count = Memory[ProgramCounter++];
+                ProgramCounter += Count;
+                break;
+            }
             default: {
                 IsInverted = false;
                 break;
