@@ -1,0 +1,25 @@
+; included #include <stdio.jc>
+
+global boot
+boot:
+  push rbp
+  mov rbp, rsp
+  ; ptr stack = 0x7C00;
+  mov qword [rbp-8], 0x7C00
+  ; ptr heap = 0x10000;
+  mov qword [rbp-16], 0x10000
+  ; ptr screen = 0xB8000;
+  mov qword [rbp-24], 0xB8000
+  ; u32 port_pic1 = 0x20;
+  mov dword [rbp-28], 0x20
+  ; u32 port_pic2 = 0xA0;
+  mov dword [rbp-32], 0xA0
+  ; u32 port_kb = 0x60;
+  mov dword [rbp-36], 0x60
+  ; u32 magoc = 0x1BADB002;
+  mov dword [rbp-40], 0x1BADB002
+  ; u32 status = k_main;
+  mov dword [rbp-44], k_main
+  mov rsp, rbp
+  pop rbp
+  ret

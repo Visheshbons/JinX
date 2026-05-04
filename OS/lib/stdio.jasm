@@ -1,0 +1,28 @@
+
+global putchar
+putchar:
+  push rbp
+  mov rbp, rsp
+  ; ptr vga = 0xB8000;
+  mov qword [rbp-8], 0xB8000
+  ; u8 attr = 0x07;
+  mov byte [rbp-9], 0x07
+  ; u8 lo = c;
+  mov byte [rbp-10], c
+  ; u8 hi = attr;
+  mov byte [rbp-11], attr
+  mov rsp, rbp
+  pop rbp
+  ret
+
+global println
+println:
+  push rbp
+  mov rbp, rsp
+  ; u8 i = 0;
+  mov byte [rbp-1], 0
+  ; u8 c = text;
+  mov byte [rbp-2], text
+  mov rsp, rbp
+  pop rbp
+  ret
