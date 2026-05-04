@@ -5,10 +5,10 @@ Key:
     MOV8 R1, 5
     READ_KEY R2
     OUTPUT R2
-    
+
     ADDI R0, 1
     SUB R1, R0
-
+    
     JUMP_IF_ZERO R1, Escape
     JUMP Key
 Escape:
