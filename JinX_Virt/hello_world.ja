@@ -1,0 +1,15 @@
+LEA R0, message
+CALL print
+HALT
+
+print:
+    READ_MEM R0, R1
+    JUMP_IF_ZERO R1, done
+    OUTPUT R1
+    ADDI R0, 1
+    JUMP print
+done:
+    RETURN
+
+message:
+    DB 'H', 'e', 'l', 'l', 'o', ' ', 'W', 'o', 'r', 'l', 'd', '!', 10, 0
