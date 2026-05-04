@@ -174,7 +174,7 @@ void FirstPass(const std::vector<std::string>& Lines) {
                 size_t Position = 0;
                 while ((Position = Values.find(',')) != std::string::npos) {
                     ByteCount++;
-                    Values = Values.substr(Pos + 1);
+                    Values = Values.substr(Position + 1);
                 }
                 ByteCount++;
             }
@@ -337,8 +337,10 @@ void AssembleLine(const std::string& Line, uint32_t& PC) {
             Values = Values.substr(Position + 1);
         }
 
+        std::string ValueTryParse = Trim(Values);
+
         if (!Values.empty()) {
-            Bytes.push_back(ParseValue(Trim(Values)));
+            Bytes.push_back(ParseValue(ValueTryParse));
         }
         
         WriteByte(OperationCodes["DB"]);
