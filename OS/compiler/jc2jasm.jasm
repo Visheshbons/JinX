@@ -1,0 +1,48 @@
+
+global lex
+lex:
+  push rbp
+  mov rbp, rsp
+  ; u32 i = 0;
+  mov dword [rbp-4], 0
+  mov eax, i
+  mov rsp, rbp
+  pop rbp
+  ret
+
+global parse
+parse:
+  push rbp
+  mov rbp, rsp
+  ; u32 ast = 0;
+  mov dword [rbp-4], 0
+  mov eax, ast
+  mov rsp, rbp
+  pop rbp
+  ret
+
+global emit_jasm
+emit_jasm:
+  push rbp
+  mov rbp, rsp
+  ; u32 lines = 0;
+  mov dword [rbp-4], 0
+  mov eax, lines
+  mov rsp, rbp
+  pop rbp
+  ret
+
+global compile_jc_to_jasm
+compile_jc_to_jasm:
+  push rbp
+  mov rbp, rsp
+  ; u32 tokens = lex ( source );
+  mov dword [rbp-4], lex ( source )
+  ; u32 ast = parse ( tokens );
+  mov dword [rbp-8], parse ( tokens )
+  ; u32 lines = emit_jasm ( ast , out );
+  mov dword [rbp-12], emit_jasm ( ast , out )
+  mov eax, lines
+  mov rsp, rbp
+  pop rbp
+  ret

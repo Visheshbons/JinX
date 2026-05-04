@@ -4,6 +4,7 @@ class Generator:
         self.output = []
         self.local_vars = {}  # Tracks variable names and their stack offsets
         self.current_offset = 0
+        self.label_counter = 0
 
     def generate(self):
         """Iterates through the root nodes of the AST."""
@@ -13,65 +14,63 @@ class Generator:
         return "\n".join(self.output)
 
     def visit(self, node):
-        """Directs the node to the correct handler based on its type."""
-        method_name = f"visit_{node.node_type}"
-        visitor = getattr(self, method_name, self.generic_visit)
-        return visitor(node)
+        fn = getattr(self, f"visit_{node.node_type}", self.generic_visit)
+        return fn(node)
 
     def generic_visit(self, node):
-        """Fallback for nodes we haven't implemented yet."""
-        self.output.append(f"; WARNING: Unhandled node type: {node.node_type}")
+        self.output.append(f"  ; WARNING: Unhandled node type: {node.node_type}")
 
     def visit_INCLUDE(self, node):
-        # We just leave a comment in the JASM file
         self.output.append(f"; included {node.value}")
 
     def visit_FUNCTION_DECL(self, node):
-        func_name = node.value["name"]
-
-        # Reset stack offset and variables for the new function
+        name = node.value["name"]
         self.local_vars = {}
         self.current_offset = 0
-
-        self.output.append(f"\nglobal {func_name}")
-        self.output.append(f"{func_name}:")
-
-        # Intel Function Prologue
+        self.output.append(f"\nglobal {name}")
+        self.output.append(f"{name}:")
         self.output.append("  push rbp")
         self.output.append("  mov rbp, rsp")
-
-        # Generate code for the body of the function
         for child in node.children:
             self.visit(child)
-
-        # Intel Function Epilogue
-        self.output.append("  mov rsp, rbp")  # Restore stack pointer
-        self.output.append("  pop rbp")  # Restore base pointer
+        self.output.append("  mov rsp, rbp")
+        self.output.append("  pop rbp")
         self.output.append("  ret")
 
+    def _stack_ref(self, offset):
+        return f"[rbp{offset}]" if offset < 0 else f"[rbp+{offset}]"
+
     def visit_VAR_DECL(self, node):
-        var_name = node.value["name"]
-        var_val = node.value["init"]
-        var_type = node.value["type"]
-
-        # Calculate stack offset based on type
-        # u32 is 4 bytes (dword). We subtract from the offset because the stack grows downwards.
-        if var_type == "u32":
+        n = node.value["name"]
+        t = node.value["type"]
+        v = node.value["init"]
+        if t == "u32":
             self.current_offset -= 4
-            size_directive = "dword"
-        elif var_type == "u8" or var_type == "bool":
+            d = "dword"
+        elif t in ("u8", "bool"):
             self.current_offset -= 1
-            size_directive = "byte"
-        elif var_type == "ptr":
-            self.current_offset -= 8  # 64-bit pointers
-            size_directive = "qword"
+            d = "byte"
         else:
-            self.current_offset -= 8  # Default fallback
-            size_directive = "qword"
+            self.current_offset -= 8
+            d = "qword"
+        self.local_vars[n] = self.current_offset
+        self.output.append(f"  ; {t} {n} = {v};")
+        self.output.append(f"  mov {d} {self._stack_ref(self.current_offset)}, {v}")
 
-        self.local_vars[var_name] = self.current_offset
+    def visit_RETURN(self, node):
+        val = node.value if node.value else "0"
+        self.output.append(f"  mov eax, {val}")
 
-        self.output.append(f"  ; {var_type} {var_name} = {var_val};")
-        self.output.append(
-            f"  mov {size_directive} [rbp{self.current_offset}], {var_val}"
-        )
+    def visit_CALL(self, node):
+        name = node.value['name']
+        self.output.append(f"  ; call {name}({', '.join(node.value['args'])})")
+        self.output.append(f"  call {name}")
+
+    def visit_WHILE(self, node):
+        lbl = self.label_counter
+        self.label_counter += 1
+        self.output.append(f".while_{lbl}:")
+        # placeholder infinite/simple loop behaviour
+        for child in node.children:
+            self.visit(child)
+        self.output.append(f"  jmp .while_{lbl}")

@@ -8,6 +8,9 @@ k_main:
   mov qword [rbp-8], 0xB8000
   ; u32 status = 0;
   mov dword [rbp-12], 0
+  ; call println("Kernel loaded")
+  call println
+  mov eax, status
   mov rsp, rbp
   pop rbp
   ret

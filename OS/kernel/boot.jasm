@@ -1,7 +1,34 @@
 ; included #include <stdio.jc>
 
-global boot
-boot:
+global clear_screen
+clear_screen:
+  push rbp
+  mov rbp, rsp
+  ; ptr screen = 0xB8000;
+  mov qword [rbp-8], 0xB8000
+  ; u32 cols = 80;
+  mov dword [rbp-12], 80
+  ; u32 rows = 25;
+  mov dword [rbp-16], 25
+  ; u32 total = 2000;
+  mov dword [rbp-20], 2000
+  ; u32 i = 0;
+  mov dword [rbp-24], 0
+.while_0:
+  ; WARNING: Unhandled node type: NOOP
+  ; WARNING: Unhandled node type: NOOP
+  ; WARNING: Unhandled node type: NOOP
+  ; WARNING: Unhandled node type: NOOP
+  ; WARNING: Unhandled node type: NOOP
+  ; WARNING: Unhandled node type: NOOP
+  jmp .while_0
+  mov eax, 0
+  mov rsp, rbp
+  pop rbp
+  ret
+
+global setup_memory
+setup_memory:
   push rbp
   mov rbp, rsp
   ; ptr stack = 0x7C00;
@@ -10,16 +37,43 @@ boot:
   mov qword [rbp-16], 0x10000
   ; ptr screen = 0xB8000;
   mov qword [rbp-24], 0xB8000
+  mov eax, 0
+  mov rsp, rbp
+  pop rbp
+  ret
+
+global setup_ports
+setup_ports:
+  push rbp
+  mov rbp, rsp
   ; u32 port_pic1 = 0x20;
-  mov dword [rbp-28], 0x20
+  mov dword [rbp-4], 0x20
   ; u32 port_pic2 = 0xA0;
-  mov dword [rbp-32], 0xA0
+  mov dword [rbp-8], 0xA0
   ; u32 port_kb = 0x60;
-  mov dword [rbp-36], 0x60
-  ; u32 magoc = 0x1BADB002;
-  mov dword [rbp-40], 0x1BADB002
-  ; u32 status = k_main;
-  mov dword [rbp-44], k_main
+  mov dword [rbp-12], 0x60
+  mov eax, 0
+  mov rsp, rbp
+  pop rbp
+  ret
+
+global boot
+boot:
+  push rbp
+  mov rbp, rsp
+  ; u32 multiboot_magic = 0x1BADB002;
+  mov dword [rbp-4], 0x1BADB002
+  ; u32 memory_ok = setup_memory ( );
+  mov dword [rbp-8], setup_memory ( )
+  ; u32 ports_ok = setup_ports ( );
+  mov dword [rbp-12], setup_ports ( )
+  ; u32 screen_ok = clear_screen ( );
+  mov dword [rbp-16], clear_screen ( )
+  ; u32 status = k_main ( );
+  mov dword [rbp-20], k_main ( )
+.while_1:
+  jmp .while_1
+  mov eax, status
   mov rsp, rbp
   pop rbp
   ret

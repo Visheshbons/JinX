@@ -1,0 +1,23 @@
+// Self-hosting sketch: JC -> JASM compiler written in JC
+
+u32 lex(ptr source) {
+    u32 i = 0;
+    return i;
+}
+
+u32 parse(ptr tokens) {
+    u32 ast = 0;
+    return ast;
+}
+
+u32 emit_jasm(ptr ast, ptr out) {
+    u32 lines = 0;
+    return lines;
+}
+
+u32 compile_jc_to_jasm(ptr source, ptr out) {
+    u32 tokens = lex(source);
+    u32 ast = parse(tokens);
+    u32 lines = emit_jasm(ast, out);
+    return lines;
+}

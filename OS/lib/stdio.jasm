@@ -21,8 +21,24 @@ println:
   mov rbp, rsp
   ; u8 i = 0;
   mov byte [rbp-1], 0
-  ; u8 c = text;
-  mov byte [rbp-2], text
+.while_0:
+  ; u8 c = text [ i ];
+  mov byte [rbp-2], text [ i ]
+  ; WARNING: Unhandled node type: NOOP
+  ; WARNING: Unhandled node type: NOOP
+  ; WARNING: Unhandled node type: NOOP
+  ; WARNING: Unhandled node type: NOOP
+  ; WARNING: Unhandled node type: NOOP
+  ; WARNING: Unhandled node type: NOOP
+  ; WARNING: Unhandled node type: NOOP
+  jmp .while_0
+  ; call putchar(c)
+  call putchar
+  ; WARNING: Unhandled node type: NOOP
+  ; WARNING: Unhandled node type: NOOP
+  ; WARNING: Unhandled node type: NOOP
+  ; WARNING: Unhandled node type: NOOP
+  ; WARNING: Unhandled node type: NOOP
   mov rsp, rbp
   pop rbp
   ret
