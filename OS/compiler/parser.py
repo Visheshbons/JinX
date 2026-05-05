@@ -107,6 +107,11 @@ class Parser:
         init = self.parse_value_until_semicolon()
         self.consume("PUNCTUATION", ";")
         return Node("VAR_DECL", {"type": var_type, "name": var_name, "init": init})
+        
+    def parse_variable_del(self):
+        var_type = self.consume("KEYWORD")[1]
+        var_name = self.consume("VAR_DECL")[1]
+        # w.i.p.
 
     def parse_return(self):
         self.consume("KEYWORD", "return")

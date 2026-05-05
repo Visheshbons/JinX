@@ -3,7 +3,7 @@ import re
 TOKEN_SPEC = {
     "COMMENT": r"//.*",
     "INCLUDE": r"#include\s+<[^>]+>",
-    "KEYWORD": r"\b(func|u32|u8|ptr|str|bool|void|return|var|if|while|true|false)\b",
+    "KEYWORD": r"\b(func|u32|u8|ptr|str|bool|void|return|var|if|while|true|false|del)\b",
     "NUMBER": r"0x[0-9a-fA-F]+|\d+",
     "IDENTIFIER": r"[a-zA-Z_][a-zA-Z0-9_]*",
     "OPERATOR": r"==|!=|<=|>=|[=+*/-]",

@@ -9,6 +9,23 @@ u32 k_main() {
     u32 status = 0;
 
     println("Kernel loaded");
+    println("Self test...");
+    
+    // Math self test
+    u8 a = 1;
+    if (a + a != 2) {
+        println("Math FAIL");
+    }
+    del a;
+    
+    // String and array self test
+    str string = "string"
+    if (string[0] != 's') {
+        println("Strings and array FAIL");
+    }
+    del string;
+    
+    println("Test complete");
 
     return status;
 }
