@@ -8,7 +8,7 @@ u32 k_main() {
     ptr screen = 0xB8000;
     u32 status = 0;
 
-    println("Kernel loaded")
+    println("Kernel loaded");
 
     return status;
 }

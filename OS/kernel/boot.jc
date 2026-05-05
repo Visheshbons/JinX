@@ -32,8 +32,14 @@ u32 boot() {
     u32 memory_ok = setup_memory();
     u32 ports_ok = setup_ports();
     u32 screen_ok = clear_screen();
+    
+    // In main.jc
     u32 status = k_main();
+    
+    // Essentially async but we don't run anything
     while (true) {
     }
+    
+    // Program end
     return status;
 }
