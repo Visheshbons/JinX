@@ -5,53 +5,56 @@ Current TREE:
 ```
 .
 ├── Documentation
-│   ├── AI
-│   │   ├── JASM_Documentation.md
-│   │   └── JinX-C_Documentation.md
-│   └── JASM_Documentation_Original.md
+│   ├── AI
+│   │   ├── JASM_Documentation.md
+│   │   └── JinX-C_Documentation.md
+│   ├── JASM_Documentation_Original.md
+│   └── JinX-C_Docs.md
 ├── JinX_Virt
-│   ├── Core.cpp
-│   ├── hello_world.ja
-│   ├── JA2.cpp
-│   ├── JA.cpp
-│   ├── JASM_VM
-│   ├── JinXVirtual.cpp
-│   ├── JinXVirtual.h
-│   └── keys.ja
+│   ├── Core.cpp
+│   ├── hello_world.ja
+│   ├── JA2.cpp
+│   ├── JA.cpp
+│   ├── JASM_VM
+│   ├── JinXVirtual.cpp
+│   ├── JinXVirtual.h
+│   ├── keys.ja
+│   ├── Lexer.hpp
+│   └── main.jc
 ├── OS
-│   ├── bin
-│   │   ├── build-scripts
-│   │   ├── compiler
-│   │   │   ├── generator.cpython-314.pyc
-│   │   │   ├── lexer.cpython-314.pyc
-│   │   │   └── parser.cpython-314.pyc
-│   │   ├── kernel
-│   │   └── lib
-│   ├── build_scripts
-│   ├── compiler
-│   │   ├── generator.py
-│   │   ├── jc2jasm.jasm
-│   │   ├── jc2jasm.jc
-│   │   ├── lexer.py
-│   │   ├── main.py
-│   │   ├── parser.py
-│   │   └── __pycache__
-│   │       ├── generator.cpython-314.pyc
-│   │       ├── lexer.cpython-314.pyc
-│   │       └── parser.cpython-314.pyc
-│   ├── kernel
-│   │   ├── boot.jasm
-│   │   ├── boot.jc
-│   │   ├── drivers
-│   │   ├── main.jasm
-│   │   └── main.jc
-│   └── lib
-│       ├── stdio.jasm
-│       └── stdio.jc
+│   ├── bin
+│   │   ├── build-scripts
+│   │   ├── compiler
+│   │   │   ├── generator.cpython-314.pyc
+│   │   │   ├── lexer.cpython-314.pyc
+│   │   │   └── parser.cpython-314.pyc
+│   │   ├── kernel
+│   │   └── lib
+│   ├── build_scripts
+│   ├── compiler
+│   │   ├── generator.py
+│   │   ├── jc2jasm.jasm
+│   │   ├── jc2jasm.jc
+│   │   ├── lexer.py
+│   │   ├── main.py
+│   │   ├── parser.py
+│   │   └── __pycache__
+│   │       ├── generator.cpython-314.pyc
+│   │       ├── lexer.cpython-314.pyc
+│   │       └── parser.cpython-314.pyc
+│   ├── kernel
+│   │   ├── boot.jasm
+│   │   ├── boot.jc
+│   │   ├── drivers
+│   │   ├── main.jasm
+│   │   └── main.jc
+│   └── lib
+│       ├── stdio.jasm
+│       └── stdio.jc
 ├── plan.md
 └── README.md
 
-16 directories, 31 files
+16 directories, 34 files
 ```
 
 ## STAGES
