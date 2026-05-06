@@ -1,6 +1,8 @@
 # JinX-C Docs `(.jc)`
 JinX-C (JC) is the custom systems language for JinX. It is intentionally C-like, but has some fundamental differences.
-This documentation will use code blocks marked with `c`, `cpp`, or `csharp`. This is purely for syntax highlighting, and should be assumed as JC code.
+
+> [!NOTE]
+>  This documentation will use code blocks marked with `c`, `cpp`, or `csharp`. This is purely for syntax highlighting, and should be assumed as JC code.
 
 ---
 
@@ -118,12 +120,16 @@ u32 main() {
     return 0;
 }
 ```
-This is an incredibly powerful feature, and should be used with extreme caution. But who doesn't love a bit of chaos? \*cough\* anyways \*cough\*
+
+> [!WARNING]
+>  This is an incredibly powerful feature, and should be used with extreme caution. But who doesn't love a bit of chaos? \*cough\* anyways \*cough\*
 
 ---
 
 ## Functions
-Functions in JC are declared using their return type. `void` can be used here.
+Functions in JC are declared using their return type.
+> [!NOTE]
+>  `void` can be used here.
 
 ```cpp (jc)
 #include <stdio.jc.h>
@@ -186,3 +192,19 @@ u32 main() {
     return 0;
 }
 ```
+
+## Opertaors and Punctuation
+
+### Operators
+JC supports the following operators:
+- Assignment: `=`
+- Arithmetic: `+` `-` `*` `/` `^` `%`
+- Comparison: `==` `!=` `<` `>` `<=` `>=`
+- Logical: `&&` `||` `!`
+
+### Punctuation
+All lines in JC must end in a semicolon.
+Yes, this means minification. (YAYAYAYAYAY LETS GOOO UNREADABLE CODE HAHA YAAA)
+Arrays are declared using square brackets. (`[]`)
+Function parameters are declared using parentheses. (`()`)
+Code blocks are declared using curly braces. (`{}`)
