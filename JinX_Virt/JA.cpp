@@ -16,8 +16,8 @@ std::map<std::string, uint8_t> OperationCodes = {
     {"JUMP_IF_ZERO", 0x21},
     {"NOT", 0x22},
     {"OUTPUT", 0x30},
-    {"WRITE", 0x40},
-    {"READ", 0x41},
+    {"WRITE_MEM", 0x40},
+    {"READ_MEM", 0x41},
     {"READ_KEY", 0x60},
     {"PUSH", 0x70},
     {"POP", 0x71},
@@ -27,7 +27,7 @@ std::map<std::string, uint8_t> OperationCodes = {
     {"JUMP_IF_EQ", 0x81},
     {"JUMP_IF_LT", 0x82},
     {"JUMP_IF_GT", 0x83},
-    {"LEA", 0x90},
+    {"LEA", 0x90}
 };
 
 std::vector<uint8_t> Bytecode;
@@ -173,7 +173,7 @@ void FirstPass(const std::vector<std::string>& Lines) {
         else if (OperationCode == "JUMP") Address += 5;
         else if (OperationCode == "JUMP_IF_EQ" || OperationCode == "JUMP_IF_LT" || OperationCode == "JUMP_IF_GT") Address += 5;
         else if (OperationCode == "JUMP_IF_ZERO") Address += 6;
-        else if (OperationCode == "READ" || OperationCode == "WRITE") Address += 6;
+        else if (OperationCode == "READ_MEM" || OperationCode == "WRITE_MEM") Address += 6;
         else if (OperationCode == "MOV32") Address += 6;
         else if (OperationCode == "LEA") Address += 6;
     }
@@ -311,27 +311,6 @@ void AssembleLine(const std::string& Line, uint32_t& PC) {
         WriteByte(OperationCodes[OperationCode]);
         WriteByte(Register);
         PC += 2;
-    } else if (OperationCode == "DB") {
-        std::vector<int> Bytes;
-        std::string Values = Rest;
-        size_t Position = 0;
-        
-        while ((Position = Values.find(',')) != std::string::npos) {
-            std::string Value = Trim(Values.substr(0, Position));
-            Bytes.push_back(ParseValue(Value));
-            Values = Values.substr(Position + 1);
-        }
-
-        std::string ValueTryParse = Trim(Values);
-
-        if (!Values.empty()) {
-            Bytes.push_back(ParseValue(ValueTryParse));
-        }
-        
-        for (int Byte : Bytes) {
-            WriteByte(Byte & 0xFF);
-        }
-        PC += Bytes.size();
     } else if (OperationCode == "JUMP" || OperationCode == "JUMP_IF_EQ" || OperationCode == "JUMP_IF_LT" || OperationCode == "JUMP_IF_GT") {
         std::string AddressString = Trim(Rest);
 
@@ -394,7 +373,7 @@ void AssembleLine(const std::string& Line, uint32_t& PC) {
         WriteByte(Register);
         WriteByte32(Address);
         PC += 6;
-    } else if (OperationCode == "WRITE" || OperationCode == "READ") {
+    } else if (OperationCode == "WRITE_MEM" || OperationCode == "READ_MEM") {
         size_t Comma = Rest.find(',');
 
         if (Comma == std::string::npos) {
@@ -454,7 +433,7 @@ int main(int ArguementC, char* ArguementV[]) {
         AssembleLine(Line, PC);
     }
 
-    std::string Outfile = (ArguementC > 2) ? ArguementV[2] : "kernel.jinx";
+    std::string Outfile = (ArguementC > 2) ? ArguementV[2] : "kernel.jbin";
     std::ofstream Output(Outfile, std::ios::binary);
     if (!Bytecode.empty()) Output.write(reinterpret_cast<char*>(&Bytecode[0]), Bytecode.size());
     Output.close();

@@ -130,7 +130,7 @@ void JinXVM::Run() {
                 if (Registers[RegisterIndex] == 0) ProgramCounter = Address;
                 break;
             }
-            case 0x22: {
+            case 0x22: { // NOT
                 IsInverted = true;
                 break;
             }
@@ -142,6 +142,21 @@ void JinXVM::Run() {
                 int Value = Registers[RegisterIndex];
                 char OutputCharacter = char(Value & 0xFF);
                 std::cout << OutputCharacter;
+                break;
+            }
+            case 0x31: { // OB (CUSTOM COMMAND named OUTPUT BYTE)
+                IsInverted = false;
+                
+                uint32_t Address = 0;
+                Address |= Memory[ProgramCounter++] << 0;
+                Address |= Memory[ProgramCounter++] << 8;
+                Address |= Memory[ProgramCounter++] << 16;
+                Address |= Memory[ProgramCounter++] << 24;
+                
+                while (Memory[Address] != 0) {
+                    std::cout << (char)Memory[Address];
+                    Address++;
+                }
                 break;
             }
             case 0x40: { // WRITE_MEM
@@ -172,6 +187,18 @@ void JinXVM::Run() {
                 ProgramCounter++;
 
                 Registers[RegisterIndex] = Memory[Address];
+                break;
+            }
+            case 0x42: { // READ_REG
+                int AddressRegister = Memory[ProgramCounter++];
+                int DestinationRegister = Memory[ProgramCounter++];
+                Registers[DestinationRegister] = Memory[Registers[AddressRegister]];
+                break;
+            }
+            case 0x43: { // WRITE_REG
+                int AddressRegister = Memory[ProgramCounter++];
+                int SourceRegister = Memory[ProgramCounter++];
+                Memory[Registers[AddressRegister]] = Registers[SourceRegister] & 0xFF;
                 break;
             }
             case 0x60: { // READ_KEY
@@ -319,11 +346,6 @@ void JinXVM::Run() {
                 Address |= Memory[ProgramCounter++] << 24;
 
                 Registers[RegisterIndex] = Address;
-                break;
-            }
-            case 0x91: {
-                int Count = Memory[ProgramCounter++];
-                ProgramCounter += Count;
                 break;
             }
             default: {

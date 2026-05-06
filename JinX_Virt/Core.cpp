@@ -53,8 +53,8 @@ int main() {
     
     JinXVM Simula(1024 * 1024);
     
-    if (!Simula.LoadFromFile("kernel.jinx")) {
-        std::cout << "Error: Failed to load kernel.jinx" << std::endl;
+    if (!Simula.LoadFromFile("kernel.jbin")) {
+        std::cout << "Error: Failed to load kernel.jbin" << std::endl;
         RestoreTerminal();
         return 1;
     }
