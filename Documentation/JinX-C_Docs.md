@@ -124,6 +124,91 @@ u32 main() {
 > [!WARNING]
 >  This is an incredibly powerful feature, and should be used with extreme caution. But who doesn't love a bit of chaos? \*cough\* anyways \*cough\*
 
+### Arrays and Objects
+JC has arrays and objects, but they are rather unique in their implementation.
+They can be declared with either the `trad` (default) or `js` tag.
+
+#### Traditional Arrays
+Just look at the code broski
+
+```cpp (jc)
+#include <stdio.jc.h>
+
+u32 main() {
+    trad u32 myArr[5] = {1, 2, 3, 4, 5};
+    println(myArr[0]); // 1
+    println(myArr[4]); // 5
+
+    return 0;
+}
+```
+So just C arrays but rebranded because gigachad
+
+#### Traditional Objects
+Uhh you are a visual learner now womp womp
+
+```cpp (jc)
+#include <stdio.jc.h>
+
+u32 main() {
+    trad struct Point {
+        u32 x;
+        u32 y;
+    }
+
+    Point p = {10, 20};
+    println("Point p is at: (" + p.x + ", " + p.y + ")"); // Point p is at: (10, 20)
+
+    return 0;
+}
+```
+This is literally C++ arrays
+
+#### JS Arrays
+JC also supports JavaScript-style arrays, which are more dynamic and easier to use.
+Also gigachad
+
+```cpp (jc)
+#include <stdio.jc.h>
+
+u32 main() {
+    js u32 myArr = [1, 2, 3, 4, 5];
+    println(myArr[0]); // 1
+    println(myArr[4]); // 5
+
+    return 0;
+}
+```
+
+#### JS Objects
+This is the greatest form of object to ever exist (in @Visheshbons's opinion)
+If you thing otherwise, you're wrong
+
+```cpp (jc)
+#include <stdio.jc.h>
+
+u32 main() {
+    js myObj = {
+        name: str "JinX",
+        version:  str "0.6.0",
+        features: str ["Slow", "Insecure", "Impossible to Use"],
+        languages: {
+            JinX-C: {
+                version: str "0.2.4",
+                status: str "In Development",
+                good: bool false
+            },
+            JinX-ASM: {
+                version: str "0.1.0",
+                status: str "In Development",
+                good: bool false
+            }
+        }
+    }
+}
+```
+
+
 ---
 
 ## Functions
