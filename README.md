@@ -10,7 +10,7 @@ This is **not** a Build Your Own Linux project, as we will not neccecarily be us
 
 
 ## Documentation
-- [JinX-C (JC) Documentation](./JinX-C_Documentation.md)
-- [JinX Assembly (JASM) Documentation](./JASM_Documentation.md)
+- [JinX-C (JC) Documentation](./Documentation/JinX-C_Docs.md)
+- [JinX Assembly (JASM) Documentation](./Documentation/JASM_Documentation_Original.md)
 
 Copyright © 2026. All rights reserved.
