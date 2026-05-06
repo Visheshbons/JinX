@@ -19,7 +19,7 @@ u32 k_main() {
     del a;
     
     // String and array self test
-    str string = "string"
+    str string = "string";
     if (string[0] != 's') {
         println("Strings and array FAIL");
     }

@@ -1,65 +1,50 @@
 import os
 import sys
 
-from generator import Generator  # generator.py
-from lexer import lex  # lexer.py
-from parser import Parser  # parser.py
+from generator import Generator
+from lexer import lex
+from parser import Parser
 
 
-def build_jinx(source_file):
-    print(f"--- JinX-C Compiler ---")
+def build_jinx(source_file, verbose=True):
+    if verbose:
+        print("--- JinX-C Compiler ---")
 
-    # Check if file exists before trying to open it
     if not os.path.exists(source_file):
-        print(f"Error: Could not find file at {source_file}")
-        print(f"Current Working Directory: {os.getcwd()}")
-        return
+        raise FileNotFoundError(f"Could not find file at {source_file}")
 
-    print(f"Reading {source_file}...")
-    with open(source_file, "r") as f:
+    if verbose:
+        print(f"Reading {source_file}...")
+    with open(source_file, "r", encoding="utf-8") as f:
         code = f.read()
 
-    # Step 1: Lexing
-    try:
-        tokens = lex(code)
-        print("Tokens generated successfully:")
-        for t in tokens:
-            print(f"  {t}")
-    except SyntaxError as e:
-        print(f"Lexer Error: {e}")
-        return
+    tokens = lex(code)
+    if verbose:
+        print("Tokens generated successfully")
 
-    # Step 2: Parsing
     parser = Parser(tokens)
-    try:
-        ast = parser.parse()
-        print("\nAST generated successfully:")
-        for node in ast:
-            print(f"  {node}")
-    except Exception as e:
-        print(f"Parser Error: {e}")
-        return
-
-    print("\nCompilation successful!")
-
-    # Step 3: Machine Code Generation
-    print("\nStarting JASM generation...")
+    ast = parser.parse()
+    if verbose:
+        print("AST generated successfully")
 
     gen = Generator(ast)
     jasm_code = gen.generate()
 
-    # Save to file
-    out_file = source_file.replace(".jc", ".jasm")
-    with open(out_file, "w") as f:
+    out_file = source_file.rsplit(".", 1)[0] + ".jasm"
+    with open(out_file, "w", encoding="utf-8") as f:
         f.write(jasm_code)
 
-    print(f"\nSuccess! Wrote JASM to {out_file}")
-    print("--- Output ---")
-    print(jasm_code)
+    if verbose:
+        print(f"Success! Wrote JASM to {out_file}")
+    return out_file, jasm_code
 
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
         print("Usage: python main.py <path_to_file.jc>")
-    else:
+        sys.exit(1)
+    try:
         build_jinx(sys.argv[1])
+    except Exception as exc:
+        print(f"Compiler Error: {exc}")
+        sys.exit(1)

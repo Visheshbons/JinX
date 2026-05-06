@@ -1,79 +1,80 @@
 ; included #include <stdio.jc.h>
 
-global clear_screen
 clear_screen:
-  push rbp
-  mov rbp, rsp
-  ; ptr screen = 0xB8000;
-  mov qword [rbp-8], 0xB8000
-  ; u32 cols = 80;
-  mov dword [rbp-12], 80
-  ; u32 rows = 25;
-  mov dword [rbp-16], 25
-  ; u32 total = 2000;
-  mov dword [rbp-20], 2000
-  ; u32 i = 0;
-  mov dword [rbp-24], 0
-.while_0:
-  ; WARNING: Unhandled node type: NOOP
-  ; WARNING: Unhandled node type: NOOP
-  ; WARNING: Unhandled node type: NOOP
-  ; WARNING: Unhandled node type: NOOP
-  ; WARNING: Unhandled node type: NOOP
-  ; WARNING: Unhandled node type: NOOP
-  jmp .while_0
-  mov eax, 0
-  mov rsp, rbp
-  pop rbp
-  ret
+    ; ptr screen = 0xB8000;
+    MOV32 R1, 753664
+    ; u32 cols = 80;
+    MOV32 R2, 80
+    ; u32 rows = 25;
+    MOV32 R3, 25
+    ; u32 total = 2000;
+    MOV32 R4, 2000
+    ; u32 i = 0;
+    MOV32 R5, 0
+while_0:
+    ; i = i + 1;
+    ADDI R5, 1
+    JUMP while_0
+endwhile_1:
+    ; return 0;
+    MOV32 R0, 0
+    ; clear_screen returns through R0
+    RETURN
 
-global setup_memory
 setup_memory:
-  push rbp
-  mov rbp, rsp
-  ; ptr stack = 0x7C00;
-  mov qword [rbp-8], 0x7C00
-  ; ptr heap = 0x10000;
-  mov qword [rbp-16], 0x10000
-  ; ptr screen = 0xB8000;
-  mov qword [rbp-24], 0xB8000
-  mov eax, 0
-  mov rsp, rbp
-  pop rbp
-  ret
+    ; ptr stack = 0x7C00;
+    MOV32 R1, 31744
+    ; ptr heap = 0x10000;
+    MOV32 R2, 65536
+    ; ptr screen = 0xB8000;
+    MOV32 R3, 753664
+    ; return 0;
+    MOV32 R0, 0
+    ; setup_memory returns through R0
+    RETURN
 
-global setup_ports
 setup_ports:
-  push rbp
-  mov rbp, rsp
-  ; u32 port_pic1 = 0x20;
-  mov dword [rbp-4], 0x20
-  ; u32 port_pic2 = 0xA0;
-  mov dword [rbp-8], 0xA0
-  ; u32 port_kb = 0x60;
-  mov dword [rbp-12], 0x60
-  mov eax, 0
-  mov rsp, rbp
-  pop rbp
-  ret
+    ; u32 port_pic1 = 0x20;
+    MOV32 R1, 32
+    ; u32 port_pic2 = 0xA0;
+    MOV32 R2, 160
+    ; u32 port_kb = 0x60;
+    MOV32 R3, 96
+    ; return 0;
+    MOV32 R0, 0
+    ; setup_ports returns through R0
+    RETURN
 
-global boot
 boot:
-  push rbp
-  mov rbp, rsp
-  ; u32 multiboot_magic = 0x1BADB002;
-  mov dword [rbp-4], 0x1BADB002
-  ; u32 memory_ok = setup_memory ( );
-  mov dword [rbp-8], setup_memory ( )
-  ; u32 ports_ok = setup_ports ( );
-  mov dword [rbp-12], setup_ports ( )
-  ; u32 screen_ok = clear_screen ( );
-  mov dword [rbp-16], clear_screen ( )
-  ; u32 status = k_main ( );
-  mov dword [rbp-20], k_main ( )
-.while_1:
-  jmp .while_1
-  mov eax, status
-  mov rsp, rbp
-  pop rbp
-  ret
+    ; u32 multiboot_magic = 0x1BADB002;
+    MOV32 R1, 464367618
+    ; u32 memory_ok = setup_memory();
+    CALL setup_memory
+    ; copy R0 to R2
+    MOV32 R2, 0
+    ADD R2, R0
+    ; u32 ports_ok = setup_ports();
+    CALL setup_ports
+    ; copy R0 to R3
+    MOV32 R3, 0
+    ADD R3, R0
+    ; u32 screen_ok = clear_screen();
+    CALL clear_screen
+    ; copy R0 to R4
+    MOV32 R4, 0
+    ADD R4, R0
+    ; u32 status = k_main();
+    CALL k_main
+    ; copy R0 to R5
+    MOV32 R5, 0
+    ADD R5, R0
+while_2:
+    JUMP while_2
+endwhile_3:
+    ; return status;
+    ; copy R5 to R0
+    MOV32 R0, 0
+    ADD R0, R5
+    ; boot returns through R0
+    RETURN
+HALT

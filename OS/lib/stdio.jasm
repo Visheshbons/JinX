@@ -1,44 +1,49 @@
 
-global putchar
 putchar:
-  push rbp
-  mov rbp, rsp
-  ; ptr vga = 0xB8000;
-  mov qword [rbp-8], 0xB8000
-  ; u8 attr = 0x07;
-  mov byte [rbp-9], 0x07
-  ; u8 lo = c;
-  mov byte [rbp-10], c
-  ; u8 hi = attr;
-  mov byte [rbp-11], attr
-  mov rsp, rbp
-  pop rbp
-  ret
+    ; argument u8 c is represented by R1
+    ; ptr vga = 0xB8000;
+    MOV32 R2, 753664
+    ; u8 attr = 0x07;
+    MOV8 R3, 7
+    ; u8 lo = c;
+    ; copy R1 to R4
+    MOV8 R4, 0
+    ADD R4, R1
+    ; u8 hi = attr;
+    ; copy R3 to R5
+    MOV8 R5, 0
+    ADD R5, R3
+    ; end void function putchar
+    RETURN
 
-global println
 println:
-  push rbp
-  mov rbp, rsp
-  ; u8 i = 0;
-  mov byte [rbp-1], 0
-.while_0:
-  ; u8 c = text [ i ];
-  mov byte [rbp-2], text [ i ]
-  ; WARNING: Unhandled node type: NOOP
-  ; WARNING: Unhandled node type: NOOP
-  ; WARNING: Unhandled node type: NOOP
-  ; WARNING: Unhandled node type: NOOP
-  ; WARNING: Unhandled node type: NOOP
-  ; WARNING: Unhandled node type: NOOP
-  ; WARNING: Unhandled node type: NOOP
-  jmp .while_0
-  ; call putchar(c)
-  call putchar
-  ; WARNING: Unhandled node type: NOOP
-  ; WARNING: Unhandled node type: NOOP
-  ; WARNING: Unhandled node type: NOOP
-  ; WARNING: Unhandled node type: NOOP
-  ; WARNING: Unhandled node type: NOOP
-  mov rsp, rbp
-  pop rbp
-  ret
+    ; argument str text is represented by R1
+    ; u8 i = 0;
+    MOV8 R2, 0
+while_0:
+    ; u8 c = text[i];
+    ; aggregate expression text[i] requires runtime support; using 0
+    MOV8 R3, 0
+    ; copy R3 to R0
+    MOV32 R0, 0
+    ADD R0, R3
+    MOV32 R7, 0
+    SUB R0, R7
+    JUMP_IF_ZERO R0, cond_true_4
+    JUMP else_2
+cond_true_4:
+    JUMP endif_3
+else_2:
+endif_3:
+    ; call putchar(c);
+    ; copy R3 to R1
+    MOV32 R1, 0
+    ADD R1, R3
+    CALL putchar
+    ; i = i + 1;
+    ADDI R2, 1
+    JUMP while_0
+endwhile_1:
+    ; end void function println
+    RETURN
+HALT

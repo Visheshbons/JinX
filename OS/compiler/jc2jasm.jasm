@@ -1,48 +1,66 @@
 
-global lex
 lex:
-  push rbp
-  mov rbp, rsp
-  ; u32 i = 0;
-  mov dword [rbp-4], 0
-  mov eax, i
-  mov rsp, rbp
-  pop rbp
-  ret
+    ; argument ptr source is represented by R1
+    ; u32 i = 0;
+    MOV32 R2, 0
+    ; return i;
+    ; copy R2 to R0
+    MOV32 R0, 0
+    ADD R0, R2
+    ; lex returns through R0
+    RETURN
 
-global parse
 parse:
-  push rbp
-  mov rbp, rsp
-  ; u32 ast = 0;
-  mov dword [rbp-4], 0
-  mov eax, ast
-  mov rsp, rbp
-  pop rbp
-  ret
+    ; argument ptr tokens is represented by R1
+    ; u32 ast = 0;
+    MOV32 R2, 0
+    ; return ast;
+    ; copy R2 to R0
+    MOV32 R0, 0
+    ADD R0, R2
+    ; parse returns through R0
+    RETURN
 
-global emit_jasm
 emit_jasm:
-  push rbp
-  mov rbp, rsp
-  ; u32 lines = 0;
-  mov dword [rbp-4], 0
-  mov eax, lines
-  mov rsp, rbp
-  pop rbp
-  ret
+    ; argument ptr ast is represented by R1
+    ; argument ptr out is represented by R2
+    ; u32 lines = 0;
+    MOV32 R3, 0
+    ; return lines;
+    ; copy R3 to R0
+    MOV32 R0, 0
+    ADD R0, R3
+    ; emit_jasm returns through R0
+    RETURN
 
-global compile_jc_to_jasm
 compile_jc_to_jasm:
-  push rbp
-  mov rbp, rsp
-  ; u32 tokens = lex ( source );
-  mov dword [rbp-4], lex ( source )
-  ; u32 ast = parse ( tokens );
-  mov dword [rbp-8], parse ( tokens )
-  ; u32 lines = emit_jasm ( ast , out );
-  mov dword [rbp-12], emit_jasm ( ast , out )
-  mov eax, lines
-  mov rsp, rbp
-  pop rbp
-  ret
+    ; argument ptr source is represented by R1
+    ; argument ptr out is represented by R2
+    ; u32 tokens = lex(source);
+    CALL lex
+    ; copy R0 to R3
+    MOV32 R3, 0
+    ADD R3, R0
+    ; u32 ast = parse(tokens);
+    ; copy R3 to R1
+    MOV32 R1, 0
+    ADD R1, R3
+    CALL parse
+    ; copy R0 to R4
+    MOV32 R4, 0
+    ADD R4, R0
+    ; u32 lines = emit_jasm(ast, out);
+    ; copy R4 to R1
+    MOV32 R1, 0
+    ADD R1, R4
+    CALL emit_jasm
+    ; copy R0 to R5
+    MOV32 R5, 0
+    ADD R5, R0
+    ; return lines;
+    ; copy R5 to R0
+    MOV32 R0, 0
+    ADD R0, R5
+    ; compile_jc_to_jasm returns through R0
+    RETURN
+HALT

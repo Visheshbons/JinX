@@ -1,16 +1,64 @@
 ; included #include <stdio.jc.h>
 
-global k_main
 k_main:
-  push rbp
-  mov rbp, rsp
-  ; ptr screen = 0xB8000;
-  mov qword [rbp-8], 0xB8000
-  ; u32 status = 0;
-  mov dword [rbp-12], 0
-  ; call println("Kernel loaded")
-  call println
-  mov eax, status
-  mov rsp, rbp
-  pop rbp
-  ret
+    ; ptr screen = 0xB8000;
+    MOV32 R1, 753664
+    ; u32 status = 0;
+    MOV32 R2, 0
+    ; call println("Kernel loaded");
+    ; string literal "Kernel loaded" is represented by the runtime string table
+    MOV32 R1, 0
+    CALL println
+    ; call println("Self test...");
+    ; string literal "Self test..." is represented by the runtime string table
+    MOV32 R1, 0
+    CALL println
+    ; u8 a = 1;
+    MOV8 R3, 1
+    ; copy R3 to R0
+    MOV32 R0, 0
+    ADD R0, R3
+    ; copy R3 to R7
+    MOV32 R7, 0
+    ADD R7, R3
+    ADD R0, R7
+    MOV32 R7, 2
+    SUB R0, R7
+    JUMP_IF_ZERO R0, else_0
+    ; call println("Math FAIL");
+    ; string literal "Math FAIL" is represented by the runtime string table
+    MOV32 R1, 0
+    CALL println
+    JUMP endif_1
+else_0:
+endif_1:
+    ; del a;
+    MOV8 R3, 0
+    ; str string = "string";
+    ; string literal "string" is represented by the runtime string table
+    MOV32 R4, 0
+    ; aggregate expression string[0] requires runtime support; using 0
+    MOV32 R0, 0
+    MOV32 R7, 115
+    SUB R0, R7
+    JUMP_IF_ZERO R0, else_2
+    ; call println("Strings and array FAIL");
+    ; string literal "Strings and array FAIL" is represented by the runtime string table
+    MOV32 R1, 0
+    CALL println
+    JUMP endif_3
+else_2:
+endif_3:
+    ; del string;
+    MOV32 R4, 0
+    ; call println("Test complete");
+    ; string literal "Test complete" is represented by the runtime string table
+    MOV32 R1, 0
+    CALL println
+    ; return status;
+    ; copy R2 to R0
+    MOV32 R0, 0
+    ADD R0, R2
+    ; k_main returns through R0
+    RETURN
+HALT

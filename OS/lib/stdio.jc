@@ -1,17 +1,17 @@
 // Internal JinX-C function to print a single character
-func putchar(u8 c) {
+void putchar(u8 c) {
     ptr vga = 0xB8000;
     u8 attr = 0x07;
     u8 lo = c;
     u8 hi = attr;
 }
 
-func println(str text) {
+void println(str text) {
     u8 i = 0;
     while (true) {
         u8 c = text[i];
         if (c == 0) {}
         putchar(c);
-        i = i + 1
+        i = i + 1;
     }
 }
