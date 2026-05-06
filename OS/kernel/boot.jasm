@@ -1,4 +1,4 @@
-; included #include <stdio.jc>
+; included #include <stdio.jc.h>
 
 global clear_screen
 clear_screen:

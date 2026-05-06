@@ -1,7 +1,7 @@
 // kernel/main.jc
 // JC is JinX's C
 
-#include <stdio.jc>
+#include <stdio.jc.h>
 
 u32 k_main() {
     // This is where JinX begins

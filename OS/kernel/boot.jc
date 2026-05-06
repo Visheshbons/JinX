@@ -1,5 +1,5 @@
 // Boot entry point for JinX
-#include <stdio.jc>
+#include <stdio.jc.h>
 
 u32 clear_screen() {
     ptr screen = 0xB8000;
