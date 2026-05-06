@@ -4,17 +4,34 @@ This file will contain the rough outline for how the OS will be built.
 Current TREE:
 ```
 .
-├── JASM_Documentation.md
-├── JinX-C_Documentation.md
+├── Documentation
+│   ├── AI
+│   │   ├── JASM_Documentation.md
+│   │   └── JinX-C_Documentation.md
+│   └── JASM_Documentation_Original.md
+├── JinX_Virt
+│   ├── Core.cpp
+│   ├── hello_world.ja
+│   ├── JA2.cpp
+│   ├── JA.cpp
+│   ├── JASM_VM
+│   ├── JinXVirtual.cpp
+│   ├── JinXVirtual.h
+│   └── keys.ja
 ├── OS
 │   ├── bin
+│   │   ├── build-scripts
+│   │   ├── compiler
+│   │   │   ├── generator.cpython-314.pyc
+│   │   │   ├── lexer.cpython-314.pyc
+│   │   │   └── parser.cpython-314.pyc
+│   │   ├── kernel
+│   │   └── lib
 │   ├── build_scripts
 │   ├── compiler
-│   │   ├── Core.cpp
 │   │   ├── generator.py
-│   │   ├── JA.cpp
-│   │   ├── JinXVirtual.cpp
-│   │   ├── JinXVirtual.h
+│   │   ├── jc2jasm.jasm
+│   │   ├── jc2jasm.jc
 │   │   ├── lexer.py
 │   │   ├── main.py
 │   │   ├── parser.py
@@ -23,17 +40,18 @@ Current TREE:
 │   │       ├── lexer.cpython-314.pyc
 │   │       └── parser.cpython-314.pyc
 │   ├── kernel
+│   │   ├── boot.jasm
 │   │   ├── boot.jc
 │   │   ├── drivers
 │   │   ├── main.jasm
-│   │   ├── main.jc
-│   │   └── task.ja
+│   │   └── main.jc
 │   └── lib
+│       ├── stdio.jasm
 │       └── stdio.jc
 ├── plan.md
 └── README.md
 
-9 directories, 20 files
+16 directories, 31 files
 ```
 
 ## STAGES
