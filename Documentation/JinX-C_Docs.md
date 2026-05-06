@@ -205,8 +205,32 @@ u32 main() {
             }
         }
     }
+
+    println(myObj.name); // JinX
+    println(myObj.version); // 0.6.0
+    println(myObj.features[0]); // Slow
+    println(myObj.languages.JinX-C.version); // 0.2.
+    println(myObj.languages[0].version); // 0.2.
+    println(myObj[3][1][2]); // false
+    println(myObj.languages["JinX-C"].version); // 0.2.
+
+    return 0;
 }
 ```
+As you can see, JavaScript-style objects are true gigachad.
+
+> [!IMPORTANT]
+>  JS objects are gigachad
+
+Details and explanations:
+- JS arrays and objects are more dynamic than traditional ones
+- They can be resized and modified at runtime, which is not possible with traditional arrays and objects.
+- Shown by `println(myObj.name);` and `println(myObj.version);`, we can access object properties using dot notation.
+- Shown by `println(myObj.features[0]);`, we can access array elements using bracket notation.
+- Shown by `println(myObj.languages[0].version); // 0.2.`, we can mix and match.
+- Shown by `println(myObj[3][1][2]); // false`, we can also access properties using bracket notation with string keys, which is useful for dynamic property access.
+- Shown by `println(myObj.languages["JinX-C"].version); // 0.2.`, we can also use bracket notation with string keys to access properties, which is useful for dynamic property access.
+- JS objects are gigachad
 
 
 ---
