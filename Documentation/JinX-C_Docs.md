@@ -139,3 +139,50 @@ u32 main() {
     return 0;
 }
 ```
+
+This is pretty intuitive, and should be easy to pick up for anyone with programming experience.
+
+Example with other unique return types:
+
+```cpp (jc)
+#include <stdio.jc.h>
+str greet(str name) {
+    return "Hello, " + name + "!";
+}
+
+u32 main() {
+    str greeting = greet("JinX");
+    println(greeting); // Hello, JinX!
+    return 0;
+}
+```
+
+```cpp (jc)
+#include <stdio.jc.h>
+ptr getRawPointer() {
+    return 0xDEADBEEF;
+}
+
+u32 main() {
+    ptr rawPointer = getRawPointer();
+    println("Raw pointer value: " + rawPointer); // Raw pointer value: 3735928559
+    return 0;
+}
+```
+
+```cpp (jc)
+#include <stdio.jc.h>
+bool isEven(u32 x) {
+    return (x % 2) == 0;
+}
+
+u32 main() {
+    u32 number = 10;
+    if (isEven(number)) {
+        println(number + " is even.");
+    } else {
+        println(number + " is odd.");
+    }
+    return 0;
+}
+```
