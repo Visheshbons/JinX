@@ -1,5 +1,2 @@
-include <stdio.jh>
-
-void main() {
-    println("Hello World!");
-}(;)
+int Ten = 10;
+str SuccessText = "Success!";

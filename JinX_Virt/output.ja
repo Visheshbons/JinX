@@ -1,0 +1,5 @@
+MOV32 R0, 10
+WRITE_MEM VAR0, R0
+VAR1:
+    DB 'S', 'u', 'c', 'c', 'e', 's', 's', '!', 0
+HALT
