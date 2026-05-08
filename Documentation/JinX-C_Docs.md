@@ -84,7 +84,8 @@ const hard u32 MAX_2 = 200; // Stored in SSD
 Here, constants can be `soft` (default) or `hard`. Soft constants are memory-based, and `hard` ones are in SSD storage.
 
 ### Variable Deletion
-JC is unique in it supporting variable deletion while the program is still running. This uses the `del` keyword, and can be used with the `force` modifier to force deletion of variables still in use, and to delete constants.
+JC is unique in it supporting variable deletion while the program is still running.
+This uses the `del` keyword, and can be used with the `force` modifier to force deletion of variables still in use, and to delete constants.
 
 ```cpp (jc)
 #include <stdio.jc.h>
@@ -129,7 +130,7 @@ JC has arrays and objects, but they are rather unique in their implementation.
 They can be declared with either the `trad` (default) or `js` tag.
 
 #### Traditional Arrays
-Just look at the code broski
+JC arrays are built to be like regular C arrays, and therefore have similar syntax.
 
 ```cpp (jc)
 #include <stdio.jc.h>
@@ -142,10 +143,10 @@ u32 main() {
     return 0;
 }
 ```
-So just C arrays but rebranded because gigachad
+So just C arrays but rebranded.
 
 #### Traditional Objects
-Uhh you are a visual learner now womp womp
+Similar to C++, JC uses `struct Point` for objects.
 
 ```cpp (jc)
 #include <stdio.jc.h>
@@ -232,11 +233,50 @@ Details and explanations:
 - Shown by `println(myObj.languages["JinX-C"].version); // 0.2.`, we can also use bracket notation with string keys to access properties, which is useful for dynamic property access.
 - JS objects are gigachad
 
+#### JS Classes
+For class declarations, JC has a more deviant syntax from JS to hold true with other JC syntaxing.
+
+```cpp
+class Car {
+    constructor ( u32 x, u32 y, u32 size = 15 ) {
+        u32 this.x = x;
+        u32 this.y = y;
+        u32 this.size = size;
+
+        u32 this.speed = 0;
+        u32 this.friction = 0.05;
+
+        bool this.useBrain = (controlType == 'AI');
+    };
+```
+The `constructor` is almost identical to JS, but has type declarations in it. In the contructor params itself, defaults can be set, as shown by the variable `size`.
+```cpp
+    global void accelerate() {
+        this.speed += 1;
+    }
+```
+The `global` tag means it can be called from outside the class. 
+```cpp
+    local void airResistance() {
+        this.speed -= this.friction;
+    }
+```
+The `local` tag means it can only be called from other *internal* functions.
+```cpp
+    global u32 update() {
+        airResistance();
+    }
+}
+```
+...such as in here.
 
 ---
 
 ## Functions
+
+### Function Declarations
 Functions in JC are declared using their return type.
+
 > [!NOTE]
 >  `void` can be used here.
 
@@ -259,48 +299,51 @@ This is pretty intuitive, and should be easy to pick up for anyone with programm
 
 Example with other unique return types:
 
+Returning a string:
 ```cpp (jc)
-#include <stdio.jc.h>
 str greet(str name) {
     return "Hello, " + name + "!";
 }
-
-u32 main() {
-    str greeting = greet("JinX");
-    println(greeting); // Hello, JinX!
-    return 0;
-}
 ```
 
+Returning a pointer:
 ```cpp (jc)
-#include <stdio.jc.h>
 ptr getRawPointer() {
     return 0xDEADBEEF;
 }
-
-u32 main() {
-    ptr rawPointer = getRawPointer();
-    println("Raw pointer value: " + rawPointer); // Raw pointer value: 3735928559
-    return 0;
-}
 ```
 
+Returning a boolean:
 ```cpp (jc)
-#include <stdio.jc.h>
 bool isEven(u32 x) {
     return (x % 2) == 0;
 }
-
-u32 main() {
-    u32 number = 10;
-    if (isEven(number)) {
-        println(number + " is even.");
-    } else {
-        println(number + " is odd.");
-    }
-    return 0;
-}
 ```
+
+### Calling Functions
+Calling a function is very universal, and the standard applies in JC.
+
+Any function can be called with the following syntax:
+```cpp
+exampleFunc();
+```
+This also holds when the function has parameters:
+```cpp
+addition(2, 3);
+```
+The `return`ed data from a function can be fed into a variable:
+> [!IMPORTANT]
+>  This will throw an error if the function has a return type of `void`, or if the return type and the variable type do not fit certain criteria (shown below).
+```cpp
+u32 result = addition(2, 3);
+```
+
+The following rules apply when doing the above:
+- If it variable matches the return type, there will be no issues.
+- Return type `str` can be fed into JS arrays of `u8`.
+- Return types of unsigned integers can be fed into higher capacity unsigned integer types (eg: `u8` into `u32`)
+- Return types of signed integers can be fed into higher capacity signed integer types (eg: `s8` into `s32`)
+- Retrun types of unsigned intgers can be fed into signed integers of a higer order (eg: `u8` goes into `s32`, but does not go into `s8`)
 
 ## Opertaors and Punctuation
 
