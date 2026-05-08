@@ -1,8 +1,10 @@
 #include <iostream>
 #include <string>
-#include "Parser.hpp"
+#include "Parser2.hpp"
 
+size_t Position = 0;
 std::ofstream StringWriter;
+std::vector<StringData> Strings;   
 
 int main(int ArgumentC, char* ArgumentV[]) {
     if (ArgumentC < 2) {
@@ -12,20 +14,14 @@ int main(int ArgumentC, char* ArgumentV[]) {
     
     std::ifstream File(ArgumentV[1]);
     std::string Content((std::istreambuf_iterator<char>(File)), std::istreambuf_iterator<char>());
+    std::string_view Input{std::move(Content)};
     
-    auto Tokens = Lexer(Content);
-    
+    auto Tokens = Lexer(Input);
     StringWriter.open("output.ja");
-    
-    size_t Position = 0;
-    while (Position < Tokens.size() && Tokens[Position].Type != T_EOF) {
-        if (Tokens[Position].Type == T_INT || Tokens[Position].Type == T_STR) {
-            ParseDeclaration(Tokens, Position);
-        } else {
-            Position++;
-        }
-    }
-    
-    StringWriter << "HALT" << std::endl;
+
+    Parser Compiler(Tokens);
+    ASTNode Program = Compiler.Parse();
+    Compiler.PrintAST(Program);
+    Compiler.GenerateCode(Program, StringWriter, Strings);
     StringWriter.close();
 }

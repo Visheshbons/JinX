@@ -134,17 +134,21 @@ void JinXVM::Run() {
                 IsInverted = true;
                 break;
             }
-            case 0x30: { // OUTPUT
+            case 0x30: { // INTOUT
                 IsInverted = false;
-
-                int RegisterIndex = Memory[ProgramCounter];
-                ProgramCounter++;
+                int RegisterIndex = Memory[ProgramCounter++];
                 int Value = Registers[RegisterIndex];
-                char OutputCharacter = char(Value & 0xFF);
-                std::cout << OutputCharacter;
+                std::cout << Value;
                 break;
             }
-            case 0x31: { // OB (CUSTOM COMMAND named OUTPUT BYTE)
+            case 0x31: { // CHAROUT
+                IsInverted = false;
+                int RegisterIndex = Memory[ProgramCounter++];
+                char Character = char(Registers[RegisterIndex] & 0xFF);
+                std::cout << Character;
+                break;
+            }
+            case 0x32: { // OB (CUSTOM COMMAND named OUTPUT BYTE)
                 IsInverted = false;
                 
                 uint32_t Address = 0;

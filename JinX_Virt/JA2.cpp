@@ -19,8 +19,9 @@ enum class OperationCode : uint8_t {
     JUMP = 0x20,
     JUMP_IF_ZERO = 0x21,
     NOT = 0x22,
-    OUTPUT = 0x30,
-    OB = 0x31,
+    INTOUT = 0x30,
+    CHAROUT = 0x31,
+    OB = 0x32,
     WRITE_MEM = 0x40,
     READ_MEM = 0x41,
     READ_REG = 0x42,
@@ -40,7 +41,7 @@ enum class OperationCode : uint8_t {
 const std::unordered_map<std::string_view, int> InstanceSize = {
     {"DB", 0},
     {"HALT", 1}, {"RETURN", 1}, {"NOT", 1},
-    {"OUTPUT", 2}, {"READ_KEY", 2}, {"PUSH", 2}, {"POP", 2},
+    {"INTOUT", 2}, {"CHAROUT", 2}, {"READ_KEY", 2}, {"PUSH", 2}, {"POP", 2},
     {"MOV8", 3}, {"ADD", 3}, {"SUB", 3}, {"CMP", 3}, {"ADDI", 3}, {"READ_REG", 3}, {"WRITE_REG", 3},
     {"JUMP", 5}, {"CALL", 5},
     {"JUMP_IF_EQ", 5}, {"JUMP_IF_LT", 5}, {"JUMP_IF_GT", 5}, {"OB", 5},
@@ -145,7 +146,7 @@ void FirstPass() {
         if (IsLabel(Trimmed)) {
             std::string Label = GetLabelName(Trimmed);
             if (Labels.find(Label) != Labels.end()) {
-                std::cerr << "WARNING: duplicate label '" << Label << "'" << std::endl;
+                std::cerr << "Warning: duplicate label '" << Label << "'" << std::endl;
             }
             Labels[Label] = Address;
             continue;
@@ -185,9 +186,9 @@ void AssembleLine(std::string_view Line, uint32_t& PC) {
     if (OperationCode == "HALT") { WriteByte(0x00); PC += 1; }
     else if (OperationCode == "RETURN") { WriteByte(0x73); PC += 1; }
     else if (OperationCode == "NOT") { WriteByte(0x22); PC += 1; }
-    else if (OperationCode == "OUTPUT") {
+    else if (OperationCode == "INTOUT" || OperationCode == "CHAROUT") {
         int Register = ParseRegister(Rest);
-        WriteByte(0x30); WriteByte(Register);
+        WriteByte(OperationCode == "INTOUT" ? 0x30 : 0x31); WriteByte(Register);
         PC += 2;
     } else if (OperationCode == "READ_KEY") {
         int Register = ParseRegister(Rest);

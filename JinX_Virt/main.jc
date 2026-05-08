@@ -1,2 +1,4 @@
-int Ten = 10;
-str SuccessText = "Success!";
+int x = 10;
+int y = 20;
+
+println(x + y);

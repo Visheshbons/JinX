@@ -1,5 +1,8 @@
+#pragma once
+
 #include <vector>
 #include <string>
+#include <iostream>
 
 enum TokenType {
     T_INT,      // 0
@@ -22,7 +25,12 @@ enum TokenType {
     T_LCB,      // 17
     T_RCB,      // 18
     T_EOF,       // 19
-    T_STRING_LITERAL // 20
+    T_STRING_LITERAL, // 20
+    T_ADD, // 21
+    T_SUB, // 22
+    T_MUL, // 23
+    T_DIV, // 24
+    T_PRINTLN // 25
 };
 
 struct Token {
@@ -30,14 +38,19 @@ struct Token {
     std::string Value;
 };
 
-std::vector<Token> Lexer(const std::string& Source) {
+std::vector<Token> Lexer(std::string_view& Source) noexcept {
     std::vector<Token> Tokens;
     size_t Iteration = 0;
 
-    while (Iteration< Source.size()) {
+    while (Iteration < Source.size()) {
         char Character = Source[Iteration];
 
         if (isspace(Character)) { Iteration++; continue; }
+
+        if (Character == '+') { Tokens.push_back({T_ADD, "+"}); Iteration++; continue; }
+        if (Character == '-') { Tokens.push_back({T_SUB, "-"}); Iteration++; continue; }
+        if (Character == '*') { Tokens.push_back({T_MUL, "*"}); Iteration++; continue; }
+        if (Character == '/') { Tokens.push_back({T_DIV, "/"}); Iteration++; continue; }
 
         if (isalpha(Character)) {
             std::string Word;
@@ -54,6 +67,7 @@ std::vector<Token> Lexer(const std::string& Source) {
             else if (Word == "if") Tokens.push_back({T_IF, Word});
             else if (Word == "while") Tokens.push_back({T_WHILE, Word});
             else if (Word == "return") Tokens.push_back({T_RETURN, Word});
+            else if (Word == "println") Tokens.push_back({T_PRINTLN, Word});
             else Tokens.push_back({T_IDENT, Word});
             continue;
         }

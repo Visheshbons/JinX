@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <vector>
 #include <string>
@@ -59,21 +61,19 @@ void ParseDeclaration(std::vector<Token>& Tokens, size_t& Position) {
         StringWriter << "MOV32 R0, " << Value << std::endl;
         StringWriter << "WRITE_MEM " << Label << ", R0" << std::endl;
 
-        Variables.push_back({Name, Label, "int", std::stoi(Value), ""});
-    }
-
-    if (Type == T_STR) {
+        Variables.push_back({std::move(Name), std::move(Label), "int", std::stoi(Value), ""});
+    } else if (Type == T_STR) {
         std::string Label = "VAR" + std::to_string(VariableCounter++);
         
         StringWriter << Label << ":" << std::endl;
         StringWriter << "    DB ";
-        for (char Character : Value) {
+        for (const char Character : Value) {
             StringWriter << "'" << Character << "', ";
         }
         StringWriter << "0" << std::endl;
         
-        Variables.push_back({Name, Label, "str", 0, Value});
+        Variables.push_back({std::move(Name), std::move(Label), "str", 0, std::move(Value)});
     }
 
-    std::cout << Name << " is declared successfully" << std::endl;
+    // std::cout << Name << " is declared successfully" << std::endl;
 }
