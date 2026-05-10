@@ -352,6 +352,63 @@ void JinXVM::Run() {
                 Registers[RegisterIndex] = Address;
                 break;
             }
+            case 0xA0: { // MUL
+                int Destination = Memory[ProgramCounter++];
+                int Source = Memory[ProgramCounter++];
+                Registers[Destination] *= Registers[Source];
+                break;
+            }
+            case 0xA1: { // DIV
+                int Destination = Memory[ProgramCounter++];
+                int Source = Memory[ProgramCounter++];
+                if (Registers[Source] != 0) {
+                    Registers[Destination] /= Registers[Source];
+                } else {
+                    std::cerr << "Error: division by zero" << std::endl;
+                    Running = false;
+                }
+                break;
+            }
+            case 0xA2: { // MOD
+                int Destination = Memory[ProgramCounter++];
+                int Source = Memory[ProgramCounter++];
+                if (Registers[Source] != 0) {
+                    Registers[Destination] %= Registers[Source];
+                } else {
+                    std::cerr << "Error: modulo by zero" << std::endl;
+                    Running = false;
+                }
+                break;
+            }
+            case 0xB0: { // BOOLMOV
+                int Register = Memory[ProgramCounter++];
+                uint8_t Value = Memory[ProgramCounter++];
+                Registers[Register] = (Value != 0) ? 1 : 0;
+                break;
+            }
+            case 0xB1: { // BOOLAND
+                int Destination = Memory[ProgramCounter++];
+                int Source = Memory[ProgramCounter++];
+                Registers[Destination] = (Registers[Destination] && Registers[Source]) ? 1 : 0;
+                break;
+            }
+            case 0xB2: { // BOOLOR
+                int Destination = Memory[ProgramCounter++];
+                int Source = Memory[ProgramCounter++];
+                Registers[Destination] = (Registers[Destination] || Registers[Source]) ? 1 : 0;
+                break;
+            }
+            case 0xB3: { // BOOLNOT
+                int Destination = Memory[ProgramCounter++];
+                Registers[Destination] = (Registers[Destination] == 0) ? 1 : 0;
+                break;
+            }
+            case 0xB4: { // BOOLXOR
+                int Destination = Memory[ProgramCounter++];
+                int Source = Memory[ProgramCounter++];
+                Registers[Destination] = (Registers[Destination] != Registers[Source]) ? 1 : 0;
+                break;
+            }
             default: {
                 IsInverted = false;
                 break;

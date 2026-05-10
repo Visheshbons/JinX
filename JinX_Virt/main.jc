@@ -1,4 +1,6 @@
-int x = 10;
-int y = 20;
-
-println(x + y);
+char x = 'x';
+println(x);
+int y = 1 + 2;
+println(x);
+str z = "This is JC in 10 seconds!";
+println(z);
