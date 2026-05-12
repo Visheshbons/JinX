@@ -49,6 +49,8 @@ JC's variable types are slightly different from standard C or C++. The current v
 
 - `s64`, `s128` - Larger signed integer types. These are used for more specific use cases where larger numbers are required.
 
+- Declaring variables to hold other types are shown below, in the section about 
+
 ### Variable Declarations
 Variable declarations in JC are very similar to C and C++.
 
@@ -136,7 +138,7 @@ JC arrays are built to be like regular C arrays, and therefore have similar synt
 #include <stdio.jc.h>
 
 u32 main() {
-    trad u32 myArr[5] = {1, 2, 3, 4, 5};
+    tradArr u32 myArr[5] = {1, 2, 3, 4, 5};
     println(myArr[0]); // 1
     println(myArr[4]); // 5
 
@@ -152,7 +154,7 @@ Similar to C++, JC uses `struct Point` for objects.
 #include <stdio.jc.h>
 
 u32 main() {
-    trad struct Point {
+    tradObj struct Point {
         u32 x;
         u32 y;
     }
@@ -173,7 +175,7 @@ Also gigachad
 #include <stdio.jc.h>
 
 u32 main() {
-    js u32 myArr = [1, 2, 3, 4, 5];
+    jsarr u32 myArr = [1, 2, 3, 4, 5];
     println(myArr[0]); // 1
     println(myArr[4]); // 5
 
@@ -189,7 +191,7 @@ If you thing otherwise, you're wrong
 #include <stdio.jc.h>
 
 u32 main() {
-    js myObj = {
+    jsobj myObj = {
         name: str "JinX",
         version:  str "0.6.0",
         features: str ["Slow", "Insecure", "Impossible to Use"],
@@ -269,6 +271,11 @@ The `local` tag means it can only be called from other *internal* functions.
 }
 ```
 ...such as in here.
+
+Creating instances of js classes are easy.
+```cpp
+var example = new ExampleClass()
+```
 
 ---
 
