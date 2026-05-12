@@ -95,7 +95,7 @@ void JinXVM::Run() {
                 Registers[Destination] -= Registers[Source];
                 break;
             }
-            case 0x12: { //
+            case 0x12: { // ADDI
                 IsInverted = false;
 
                 int Destination = Memory[ProgramCounter];
