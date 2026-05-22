@@ -43,14 +43,20 @@ enum class OperationCode : uint8_t {
     BOOLAND = 0xB1,
     BOOLOR = 0xB2,
     BOOLNOT = 0xB3,
-    BOOLXOR = 0xB4
+    BOOLXOR = 0xB4,
+    AND = 0xC0,
+    OR = 0xC1,
+    XOR = 0xC2,
+    BITNOT = 0xC3,
+    SHL = 0xC4,
+    SHR = 0xC5
 };
 
 const std::unordered_map<std::string_view, int> InstanceSize = {
     {"DB", 0},
     {"HALT", 1}, {"RETURN", 1}, {"NOT", 1},
-    {"INTOUT", 2}, {"CHAROUT", 2}, {"READ_KEY", 2}, {"PUSH", 2}, {"POP", 2}, {"BOOLNOT", 2},
-    {"MOV8", 3}, {"ADD", 3}, {"SUB", 3}, {"CMP", 3}, {"ADDI", 3}, {"READ_REG", 3}, {"WRITE_REG", 3}, {"MUL", 3}, {"DIV", 3}, {"MOD", 3}, {"BOOLMOV", 3}, {"BOOLAND", 3}, {"BOOLOR", 3}, {"BOOLXOR", 3},
+    {"INTOUT", 2}, {"CHAROUT", 2}, {"READ_KEY", 2}, {"PUSH", 2}, {"POP", 2}, {"BOOLNOT", 2}, {"BITNOT", 2},
+    {"MOV8", 3}, {"ADD", 3}, {"SUB", 3}, {"CMP", 3}, {"ADDI", 3}, {"READ_REG", 3}, {"WRITE_REG", 3}, {"MUL", 3}, {"DIV", 3}, {"MOD", 3}, {"BOOLMOV", 3}, {"BOOLAND", 3}, {"BOOLOR", 3}, {"BOOLXOR", 3}, {"AND", 3}, {"OR", 3}, {"XOR", 3}, {"SHL", 3}, {"SHR", 3},
     {"JUMP", 5}, {"CALL", 5},
     {"JUMP_IF_EQ", 5}, {"JUMP_IF_LT", 5}, {"JUMP_IF_GT", 5}, {"OB", 5},
     {"JUMP_IF_ZERO", 6},
@@ -252,6 +258,27 @@ void AssembleLine(std::string_view Line, uint32_t& PC) {
         WriteByte(0xB3);
         WriteByte(Destination);
         PC += 2;
+    } else if (OperationCode == "AND" || OperationCode == "OR" || OperationCode == "XOR" || OperationCode == "SHL" || OperationCode == "SHR") {
+        size_t Comma = Rest.find(',');
+        int Destination = ParseRegister(Rest.substr(0, Comma));
+        int Source = ParseRegister(Rest.substr(Comma + 1));
+
+        uint8_t Operation = 0xC0;
+        if (OperationCode == "AND") Operation = 0xC0;
+        else if (OperationCode == "OR") Operation = 0xC1;
+        else if (OperationCode == "XOR") Operation = 0xC2;
+        else if (OperationCode == "SHL") Operation = 0xC4;
+        else if (OperationCode == "SHR") Operation = 0xC5;
+        
+        WriteByte(Operation);
+        WriteByte(Destination);
+        WriteByte(Source);
+        PC += 3;
+    } else if (OperationCode == "BITNOT") {
+        int Destination = ParseRegister(Rest);
+        WriteByte(0xC3);
+        WriteByte(Destination);
+        PC += 2;
     } else if (OperationCode == "MOV32") {
         size_t Comma = Rest.find(',');
         int Register = ParseRegister(Rest.substr(0, Comma));
@@ -340,7 +367,7 @@ void AssembleLine(std::string_view Line, uint32_t& PC) {
         if (!Address.has_value()) {
             std::cerr << "Error: could not get address of label '" << Target << "'" << std::endl;
         }
-        WriteByte(0x31); WriteByte32(Address.value());
+        WriteByte(0x32); WriteByte32(Address.value());
         PC += 5;
     } else if (OperationCode == "READ_MEM" || OperationCode == "WRITE_MEM") {
         size_t Comma = Rest.find(',');

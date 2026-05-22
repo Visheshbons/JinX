@@ -21,6 +21,10 @@ class JinXVM {
         bool Running;
         int StackPointer;
         bool IsInverted;
+
+        float FloatRegisters[8];
+        double DoubleRegisters[8];
+        int32_t TemporaryRegisters[8];
     public:
         JinXVM(int Size);
         ~JinXVM();

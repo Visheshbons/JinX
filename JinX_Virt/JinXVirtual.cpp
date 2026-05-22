@@ -47,6 +47,8 @@ void JinXVM::Run() {
         unsigned char OperationCode = Memory[ProgramCounter];
         ProgramCounter++;
 
+        // std::cerr << "Program Counter = " << ProgramCounter << ", OperationCode = " << (int)OperationCode << std::endl;
+
         switch (OperationCode) {
             case 0x00: // HALT 
                 Running = false;
@@ -73,6 +75,33 @@ void JinXVM::Run() {
                 Value |= Memory[ProgramCounter++] << 16;
                 Value |= Memory[ProgramCounter++] << 24;
                 Registers[RegisterIndex] = Value;
+                break;
+            }
+            case 0x03: { // MOV
+                int Destination = Memory[ProgramCounter++];
+                int Source = Memory[ProgramCounter++];
+
+                int32_t SourceValue = 0;
+                if (Source >= 0 && Source <= 7) {
+                    SourceValue = TemporaryRegisters[Source];
+                    TemporaryRegisters[Source] = 0;
+                } else if (Source >= 8 && Source <= 15) {
+                    SourceValue = Registers[Source - 8];
+                } else if (Source >= 16 && Source <= 23) {
+                    memcpy(&SourceValue, &FloatRegisters[Source - 16], 4);
+                } else if (Source >= 24 && Source <= 31) {
+                    memcpy(&SourceValue, &DoubleRegisters[Source - 24], 4);
+                }
+
+                if (Destination >= 0 && Destination <= 7) {
+                    TemporaryRegisters[Destination] = SourceValue;
+                } else if (Destination >= 8 && Destination <= 15) {
+                    Registers[Destination - 8] = SourceValue;
+                } else if (Destination >= 16 && Destination <= 23) {
+                    memcpy(&FloatRegisters[Destination - 16], &SourceValue, 4);
+                } else if (Destination >= 24 && Destination <= 31) {
+                    memcpy(&DoubleRegisters[Destination - 24], &SourceValue, 4);
+                }
                 break;
             }
             case 0x10: { // ADD 
@@ -407,6 +436,43 @@ void JinXVM::Run() {
                 int Destination = Memory[ProgramCounter++];
                 int Source = Memory[ProgramCounter++];
                 Registers[Destination] = (Registers[Destination] != Registers[Source]) ? 1 : 0;
+                break;
+            }
+            case 0xC0: { // AND
+                int Destination = Memory[ProgramCounter++];
+                int Source = Memory[ProgramCounter++];
+                Registers[Destination] &= Registers[Source];
+                break;
+            }
+            case 0xC1: { // OR
+                int Destination = Memory[ProgramCounter++];
+                int Source = Memory[ProgramCounter++];
+                Registers[Destination] |= Registers[Source];
+                break;
+            }
+            case 0xC2: { // XOR
+                int Destination = Memory[ProgramCounter++];
+                int Source = Memory[ProgramCounter++];
+                Registers[Destination] ^= Registers[Source];
+                break;
+            }
+            case 0xC3: { // BITNOT
+                int Destination = Memory[ProgramCounter++];
+                Registers[Destination] = ~Registers[Destination];
+                break;
+            }
+            case 0xC4: { // SHL
+                int Destination = Memory[ProgramCounter++];
+                int Amount = Memory[ProgramCounter++];
+                int Value = Memory[Amount];
+                Registers[Destination] <<= Value;
+                break;
+            }
+            case 0xC5: { // SHR
+                int Destination = Memory[ProgramCounter++];
+                int Amount = Memory[ProgramCounter++];
+                int Value = Memory[Amount];
+                Registers[Destination] >>= Amount;
                 break;
             }
             default: {
