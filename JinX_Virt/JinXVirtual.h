@@ -34,6 +34,7 @@ class JinXVM {
         void WriteByte(int Address, unsigned char Value);
         void SetProgramCounter(int Address);
         bool LoadFromFile(const char* Filename);
+        int DecodeRegister(int Encoded);
 };
 
 #endif

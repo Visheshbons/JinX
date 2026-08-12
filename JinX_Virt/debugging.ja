@@ -1,0 +1,8 @@
+; debugging.ja
+MOV32 R0, 8
+MOV32 R1, 2
+SHL R0, R1      ; R0 = 8 << 2 = 32
+INTOUT R0
+MOV8 R0, 10
+CHAROUT R0
+HALT

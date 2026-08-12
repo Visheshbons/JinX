@@ -1,6 +1,7 @@
 #include "JinXVirtual.h"
 #include <fstream>
 #include <iostream>
+#include <iomanip>
 
 #if defined(__APPLE__) || defined(__linux__)
     #include <sys/select.h>
@@ -25,7 +26,11 @@ JinXVM::JinXVM(int Size) {
 
     for (int _ = 0; _ < 8; _++) {
         Registers[_] = 0;
+        FloatRegisters[_] = 0.0;
+        DoubleRegisters[_] = 0.0;
+        TemporaryRegisters[_] = 0;
     }
+
     ProgramCounter = 0;
     Condition = {false, false, false};
     IsInverted = false;
@@ -37,6 +42,9 @@ JinXVM::~JinXVM() {
 
     for (int _ = 0; _ < 8; _++) {
         Registers[_] = 0;
+        FloatRegisters[_] = 0.0;
+        DoubleRegisters[_] = 0.0;
+        TemporaryRegisters[_] = 0;
     }
 }
 
@@ -88,9 +96,9 @@ void JinXVM::Run() {
                 } else if (Source >= 8 && Source <= 15) {
                     SourceValue = Registers[Source - 8];
                 } else if (Source >= 16 && Source <= 23) {
-                    memcpy(&SourceValue, &FloatRegisters[Source - 16], 4);
+                    SourceValue = (int32_t)FloatRegisters[Source - 16];
                 } else if (Source >= 24 && Source <= 31) {
-                    memcpy(&SourceValue, &DoubleRegisters[Source - 24], 4);
+                    SourceValue = (int32_t)DoubleRegisters[Source - 24];
                 }
 
                 if (Destination >= 0 && Destination <= 7) {
@@ -98,10 +106,11 @@ void JinXVM::Run() {
                 } else if (Destination >= 8 && Destination <= 15) {
                     Registers[Destination - 8] = SourceValue;
                 } else if (Destination >= 16 && Destination <= 23) {
-                    memcpy(&FloatRegisters[Destination - 16], &SourceValue, 4);
+                    FloatRegisters[Destination - 16] = (float)SourceValue;
                 } else if (Destination >= 24 && Destination <= 31) {
-                    memcpy(&DoubleRegisters[Destination - 24], &SourceValue, 4);
+                    DoubleRegisters[Destination - 24] = (double)SourceValue;
                 }
+
                 break;
             }
             case 0x10: { // ADD 
@@ -190,6 +199,15 @@ void JinXVM::Run() {
                     std::cout << (char)Memory[Address];
                     Address++;
                 }
+                break;
+            }
+            case 0x33: { // REALOUT (OUTPUT for FLOAT or DOUBLE)
+                IsInverted = false;
+                int Type = Memory[ProgramCounter++];  // Codes 0 for float and 1 for double
+                int Register = Memory[ProgramCounter++];
+
+                if (Type == 0) std::cout << FloatRegisters[Register - 16];
+                else std::cout << std::setprecision(15) << DoubleRegisters[Register - 24];
                 break;
             }
             case 0x40: { // WRITE_MEM
@@ -463,16 +481,92 @@ void JinXVM::Run() {
             }
             case 0xC4: { // SHL
                 int Destination = Memory[ProgramCounter++];
-                int Amount = Memory[ProgramCounter++];
-                int Value = Memory[Amount];
-                Registers[Destination] <<= Value;
+                int Source = Memory[ProgramCounter++];
+                int Amount = Registers[Source];
+                Registers[Destination] <<= Amount;
                 break;
             }
             case 0xC5: { // SHR
                 int Destination = Memory[ProgramCounter++];
-                int Amount = Memory[ProgramCounter++];
-                int Value = Memory[Amount];
+                int Source = Memory[ProgramCounter++];
+                int Amount = Registers[Source];
                 Registers[Destination] >>= Amount;
+                break;
+            }
+            case 0xD0: { // FMOV
+                // Updated to Big Endian:
+                int Register = Memory[ProgramCounter++] - 16; // -16 is to avoid writing into the adjacent registers (this may be double or temporary)
+                uint32_t Bits = 0;
+                Bits |= (uint32_t)Memory[ProgramCounter++] << 24;
+                Bits |= (uint32_t)Memory[ProgramCounter++] << 16;
+                Bits |= (uint32_t)Memory[ProgramCounter++] << 8;
+                Bits |= (uint32_t)Memory[ProgramCounter++] << 0;
+                memcpy(&FloatRegisters[Register], &Bits, 4);
+                break;
+            }
+            case 0xD1: { // FADD 
+                int Destination = Memory[ProgramCounter++] - 16;
+                int Source = Memory[ProgramCounter++] - 16;
+                FloatRegisters[Destination] += FloatRegisters[Source];
+                break;
+            }
+            case 0xD2: { // FSUB
+                int Destination = Memory[ProgramCounter++] - 16;
+                int Source = Memory[ProgramCounter++] - 16;
+                FloatRegisters[Destination] -= FloatRegisters[Source];
+                break;
+            }
+            case 0xD3: { // FMUL
+                int Destination = Memory[ProgramCounter++] - 16;
+                int Source = Memory[ProgramCounter++] - 16;
+                FloatRegisters[Destination] *= FloatRegisters[Source];
+                break;
+            }
+            case 0xD4: { // FDIV
+                int Destination = Memory[ProgramCounter++] - 16;
+                int Source = Memory[ProgramCounter++] - 16;
+                if (FloatRegisters[Source] != 0.0f) FloatRegisters[Destination] /= FloatRegisters[Source];
+                else std::cerr << "Error: float division by zero" << std::endl;
+                break;
+            }
+            case 0xE0: { // DMOV
+                // Updated to Big Endian:
+                int Register = Memory[ProgramCounter++] - 24;
+                uint64_t Bits = 0;
+                Bits |= (uint64_t)Memory[ProgramCounter++] << 56;
+                Bits |= (uint64_t)Memory[ProgramCounter++] << 48;
+                Bits |= (uint64_t)Memory[ProgramCounter++] << 40;
+                Bits |= (uint64_t)Memory[ProgramCounter++] << 32;
+                Bits |= (uint64_t)Memory[ProgramCounter++] << 24;
+                Bits |= (uint64_t)Memory[ProgramCounter++] << 16;
+                Bits |= (uint64_t)Memory[ProgramCounter++] << 8;
+                Bits |= (uint64_t)Memory[ProgramCounter++] << 0;
+                memcpy(&DoubleRegisters[Register], &Bits, 8);
+                break;
+            }
+            case 0xE1: { // DADD
+                int Destination = Memory[ProgramCounter++] - 24;
+                int Source = Memory[ProgramCounter++] - 24;
+                DoubleRegisters[Destination] += DoubleRegisters[Source];
+                break;
+            }
+            case 0xE2: { // DSUB
+                int Destination = Memory[ProgramCounter++] - 24;
+                int Source = Memory[ProgramCounter++] - 24;
+                DoubleRegisters[Destination] -= DoubleRegisters[Source];
+                break;
+            }
+            case 0xE3: { // DMUL
+                int Destination = Memory[ProgramCounter++] - 24;
+                int Source = Memory[ProgramCounter++] - 24;
+                DoubleRegisters[Destination] *= DoubleRegisters[Source];
+                break;
+            }
+            case 0xE4: { // DDIV
+                int Destination = Memory[ProgramCounter++] - 24;
+                int Source = Memory[ProgramCounter++] - 24;
+                if (DoubleRegisters[Source] != 0.0) DoubleRegisters[Destination] /= DoubleRegisters[Source];
+                else std::cerr << "Error: double division by zero" << std::endl;
                 break;
             }
             default: {
@@ -510,4 +604,24 @@ bool JinXVM::LoadFromFile(const char* Filename) {
 
     ProgramCounter = 0;
     return true;
+}
+
+int JinXVM::DecodeRegister(int Encoded) {
+    // Encoded registers:
+    // X0 -> X7 found as 0 -> 7, 
+    // R0 -> R7 found as 8 -> 15, 
+    // F0 -> F7 found as 16 -> 23,
+    // D0 -> D7 found as 24 -> 31
+
+    if (Encoded >= 0 && Encoded <= 7) {
+        return Encoded;
+    } else if (Encoded >= 8 && Encoded <= 15) {
+        return Encoded - 8;
+    } else if (Encoded >= 16 && Encoded <= 23) {
+        return Encoded - 16;
+    } else if (Encoded >= 24 && Encoded <= 31) {
+        return Encoded - 24;
+    }
+
+    return 0;
 }
