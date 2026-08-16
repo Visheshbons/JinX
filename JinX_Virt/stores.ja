@@ -1,0 +1,5 @@
+MOV8 R0, 'p'
+STORE H0, R0
+MOV8 R1, 'i'
+STORE H1, R1
+HALT

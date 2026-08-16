@@ -1,0 +1,441 @@
+#define __jcc__parse INVOKE_JCC_SEMANTICS
+#define __jcc__fail 0
+#define __jcc__success 1
+
+literal __size_t = [&] (auto arg) {
+    if (typeof arg typeeval int) {
+        if (arg < 0) arg = 0;
+    } else {
+        compiler_error(arg, " is not compatible with the size_t type");
+    }
+};
+
+typedef __size_t size_t;
+
+literal __array_lit = operator{} [&] (id assortment[]) {
+    sizeof = [&] () {
+        size_t count = 0;
+        while (__jcc__parse.getline()) {
+            if (__jcc__parse.find(,)) count++;
+        }
+        return count;
+    };
+    size_t length = sizeof(assortment) / sizeof(is_type(assortment[0]));
+    for (size_t i = 0; i < length - 1; i++) {
+        if (__jcc__parse.get_exception("bounds")) compiler_error("Array is not homogenous");
+        if (is_type(assortment[i]) == is_type(assortment[0])) {
+            continue;
+        } else {
+            compiler_error(assortment[i], " is not uniform with other types in the array");
+        }
+    }
+};
+
+literal __str_lit = operator"" [&] (size_t size : __array_lit[size]) {
+    char i[size];
+    using char i[];
+};
+
+typedef __str_lit str;
+typedef str char;
+typedef __str_lit* char*;
+typedef (const)__str_lit const char*;
+typedef (const*)__str_lit const char* const;
+
+literal __bool_lit = {[id true = 1], [id false = 0]};
+
+typedef __bool_lit bool;
+
+literal __unsigned_auto_lit = [&] (auto arg) {
+    auto& result = is_integral(arg) ? (unsigned typeof arg)arg : 0;
+    if (result == 0) compiler_error(arg, " is not compatible with the unsigned_auto type");
+};
+
+typedef __unsigned_auto_lit unsigned_auto;
+
+typedef struct vector<id t, size_t capacity, size_t& max = capacity> : literal __array_lit {
+    auto = (is_type(t)) ? t : id;
+    if (auto !typeeval id) {
+        compile_error(t, " is not a defined type");
+    }
+    size_t p = 0;
+    t* i[capacity];
+    void push_back(t element) {
+        if (p < capacity) {
+            i[p] = &element;
+            p++;
+        } else {
+            if (p == max) compiler_error("vector is full at index ", max);
+            capacity *= 2;
+            realloc i[capacity * 2];
+        }
+    }
+    void pop_back() { i[p] = nullptr; }
+    void erase(size_t position) { i[position] = nullptr; }
+    t* begin() {
+        if (p > 0) return i[0];
+        return nullptr;
+    }
+    t* finish() {
+        if (p == 0) return nullptr;
+        return i[p - 1];
+    }
+    size_t size() { return p; }
+};
+
+literal __mov8 = [&] (auto reg, auto val) {
+    asm (
+        "MOV8 R0, 127",
+        "INTOUT R0",
+        "HALT"
+    );
+};
+
+literal __mov32 = [&] (auto reg, auto val) {
+    asm (
+        "MOV32 R0, 1000",
+        "INTOUT R0",
+        "HALT"
+    );
+};
+
+literal __add = [&] (auto dest, auto src) {
+    asm (
+        "MOV8 R0, 5",
+        "MOV8 R1, 10",
+        "ADD R0, R1",
+        "INTOUT R0",
+        "HALT"
+    );
+};
+
+literal __sub = [&] (auto dest, auto src) {
+    asm (
+        "MOV8 R0, 10",
+        "MOV8 R1, 5",
+        "SUB R0, R1",
+        "INTOUT R0",
+        "HALT"
+    );
+};
+
+literal __addi = [&] (auto reg, auto val) {
+    asm (
+        "MOV8 R0, 5",
+        "ADDI R0, 10",
+        "INTOUT R0",
+        "HALT"
+    );
+};
+
+literal __jump = [&] (auto label) {
+    asm (
+        "JUMP label",
+        "label:",
+        "   MOV8 R0, 42",
+        "   INTOUT R0",
+        "   HALT"
+    );
+};
+
+literal __jump_if_zero = [&] (auto reg, auto label) {
+    asm (
+        "MOV8 R0, 0",
+        "JUMP_IF_ZERO R0 label",
+        "MOV8 R0, 1",
+        "label:",
+        "   INTOUT R0",
+        "   HALT"
+    );
+};
+
+literal __not = [&] () {
+    asm (
+        "MOV8 R0, 0",
+        "NOT",
+        "JUMP_IF_EQ label",
+        "MOV8 R0, 1",
+        "label:",
+        "   INTOUT R0",
+        "   HALT"
+    );
+};
+
+literal __intout = [&] (auto reg) {
+    asm (
+        "MOV8 R0, 42",
+        "INTOUT R0",
+        "HALT"
+    );
+};
+
+literal __charout = [&] (auto reg) {
+    asm (
+        "MOV8 R0, 65",
+        "CHAROUT R0",
+        "HALT"
+    );
+};
+
+literal __ob = [&] (auto label) {
+    asm (
+        "OB message",
+        "HALT",
+        "message:",
+        "   DB 'H', 'e', 'l', 'l', 'o', 0"
+    );
+};
+
+literal __write_mem = [&] (auto addr, auto reg) {
+    asm (
+        "MOV8 R0, 42",
+        "WRITE_MEM 0x1000, R0",
+        "HALT"
+    );
+};
+
+literal __read_mem = [&] (auto addr, auto reg) {
+    asm (
+        "READ_MEM 0x1000, R0",
+        "INTOUT R0",
+        "HALT"
+    );
+};
+
+literal __read_reg = [&] (auto src, auto dest) {
+    asm (
+        "MOV8 R0, 42",
+        "READ_REG R0, R1",
+        "INTOUT R1",
+        "HALT"
+    );
+};
+
+literal __write_reg = [&] (auto src, auto dest) {
+    asm (
+        "MOV8 R0, 42",
+        "WRITE_REG R0, R1",
+        "HALT"
+    );
+};
+
+literal __read_key = [&] (auto reg) {
+    asm (
+        "READ_KEY R0",
+        "INTOUT R0",
+        "HALT"
+    );
+};
+
+literal __push = [&] (auto val) {
+    asm (
+        "MOV8 R0, 42",
+        "PUSH R0",
+        "HALT"
+    );
+};
+
+literal __pop = [&] (auto reg) {
+    asm (
+        "MOV8 R0, 42",
+        "PUSH R0",
+        "POP R1",
+        "INTOUT R1",
+        "HALT"
+    );
+};
+
+literal __call = [&] (auto label) {
+    asm (
+        "CALL subroutine",
+        "HALT",
+        "subroutine:",
+        "   MOV8 R0, 42",
+        "   INTOUT R0",
+        "   RETURN"
+    );
+};
+
+literal __return = [&] () {
+    asm (
+        "CALL subroutine",
+        "HALT",
+        "subroutine:",
+        "   MOV8 R0, 42",
+        "   INTOUT R0",
+        "   RETURN"
+    );
+};
+
+literal __cmp = [&] (auto reg1, auto reg2) {
+    asm (
+        "MOV8 R0, 5",
+        "MOV8 R1, 10",
+        "CMP R0, R1",
+        "JUMP_IF_LT label",
+        "MOV8 R0, 0",
+        "label:",
+        "   INTOUT R0",
+        "   HALT"
+    );
+};
+
+literal __jump_if_eq = [&] (auto label) {
+    asm (
+        "MOV8 R0, 5",
+        "MOV8 R1, 5",
+        "CMP R0, R1",
+        "JUMP_IF_EQ label",
+        "MOV8 R0, 0",
+        "label:",
+        "   INTOUT R0",
+        "   HALT"
+    );
+};
+
+literal __jump_if_lt = [&] (auto label) {
+    asm (
+        "MOV8 R0, 5",
+        "MOV8 R1, 10",
+        "CMP R0, R1",
+        "JUMP_IF_LT label",
+        "MOV8 R0, 0",
+        "label:",
+        "   INTOUT R0",
+        "   HALT"
+    );
+};
+
+literal __jump_if_gt = [&] (auto label) {
+    asm (
+        "MOV8 R0, 10",
+        "MOV8 R1, 5",
+        "CMP R0, R1",
+        "JUMP_IF_GT label",
+        "MOV8 R0, 0",
+        "label:",
+        "   INTOUT R0",
+        "   HALT"
+    );
+};
+
+literal __lea = [&] (auto addr, auto reg) {
+    asm (
+        "LEA 0x1000, R0",
+        "INTOUT R0",
+        "HALT"
+    );
+};
+
+literal __mul = [&] (auto dest, auto src) {
+    asm (
+        "MOV8 R0, 5",
+        "MOV8 R1, 10",
+        "MUL R0, R1",
+        "INTOUT R0",
+        "HALT"
+    );
+};
+
+literal __div = [&] (auto dest, auto src) {
+    asm (
+        "MOV8 R0, 10",
+        "MOV8 R1, 5",
+        "DIV R0, R1",
+        "INTOUT R0",
+        "HALT"
+    );
+};
+
+literal __mod = [&] (auto dest, auto src) {
+    asm (
+        "MOV8 R0, 10",
+        "MOV8 R1, 5",
+        "MOD R0, R1",
+        "INTOUT R0",
+        "HALT"
+    );
+};
+
+literal __boolmov = [&] (auto reg, auto val) {
+    asm (
+        "BOOLMOV R0, TRUE",
+        "INTOUT R0",
+        "HALT"
+    );
+};
+
+literal __booland = [&] (auto dest, auto src) {
+    asm (
+        "BOOLMOV R0, TRUE",
+        "BOOLMOV R1, TRUE",
+        "BOOLAND R0, R1",
+        "INTOUT R0",
+        "HALT"
+    );
+};
+
+literal __boolor = [&] (auto dest, auto src) {
+    asm (
+        "BOOLMOV R0, FALSE",
+        "BOOLMOV R1, TRUE",
+        "BOOLOR R0, R1",
+        "INTOUT R0",
+        "HALT"
+    );
+};
+
+literal __boolnot = [&] (auto reg) {
+    asm (
+        "BOOLMOV R0, TRUE",
+        "BOOLNOT R0",
+        "INTOUT R0",
+        "HALT"
+    );
+};
+
+literal __boolxor = [&] (auto dest, auto src) {
+    asm (
+        "BOOLMOV R0, TRUE",
+        "BOOLMOV R1, FALSE",
+        "BOOLXOR R0, R1",
+        "INTOUT R0",
+        "HALT"
+    );
+};
+
+typedef __mov8 mov8;
+typedef __mov32 mov32;
+typedef __add add;
+typedef __sub sub;
+typedef __addi addi;
+typedef __jump jump;
+typedef __jump_if_zero jump_if_zero;
+typedef __not not;
+typedef __intout intout;
+typedef __charout charout;
+typedef __ob ob;
+typedef __write_mem write_mem;
+typedef __read_mem read_mem;
+typedef __read_reg read_reg;
+typedef __write_reg write_reg;
+typedef __read_key read_key;
+typedef __push push;
+typedef __pop pop;
+typedef __call call;
+typedef __return return;
+typedef __cmp cmp;
+typedef __jump_if_eq jump_if_eq;
+typedef __jump_if_lt jump_if_lt;
+typedef __jump_if_gt jump_if_gt;
+typedef __lea lea;
+typedef __mul mul;
+typedef __div div;
+typedef __mod mod;
+typedef __boolmov boolmov;
+typedef __booland booland;
+typedef __boolor boolor;
+typedef __boolnot boolnot;
+typedef __boolxor boolxor;
+
+return __jcc_parse.state(__jcc_success, __jcc_fail);

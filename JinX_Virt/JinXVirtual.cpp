@@ -495,7 +495,7 @@ void JinXVM::Run() {
             }
             case 0xD0: { // FMOV
                 // Updated to Big Endian:
-                int Register = Memory[ProgramCounter++] - 16; // -16 is to avoid writing into the adjacent registers (this may be double or temporary)
+                int Register = DecodeRegister(Memory[ProgramCounter++]); // -16 is to avoid writing into the adjacent registers (this may be double or temporary)
                 uint32_t Bits = 0;
                 Bits |= (uint32_t)Memory[ProgramCounter++] << 24;
                 Bits |= (uint32_t)Memory[ProgramCounter++] << 16;
@@ -505,33 +505,33 @@ void JinXVM::Run() {
                 break;
             }
             case 0xD1: { // FADD 
-                int Destination = Memory[ProgramCounter++] - 16;
-                int Source = Memory[ProgramCounter++] - 16;
+                int Destination = DecodeRegister(Memory[ProgramCounter++]);
+                int Source = DecodeRegister(Memory[ProgramCounter++]);
                 FloatRegisters[Destination] += FloatRegisters[Source];
                 break;
             }
             case 0xD2: { // FSUB
-                int Destination = Memory[ProgramCounter++] - 16;
-                int Source = Memory[ProgramCounter++] - 16;
+                int Destination = DecodeRegister(Memory[ProgramCounter++]);
+                int Source = DecodeRegister(Memory[ProgramCounter++]);
                 FloatRegisters[Destination] -= FloatRegisters[Source];
                 break;
             }
             case 0xD3: { // FMUL
-                int Destination = Memory[ProgramCounter++] - 16;
-                int Source = Memory[ProgramCounter++] - 16;
+                int Destination = DecodeRegister(Memory[ProgramCounter++]);
+                int Source = DecodeRegister(Memory[ProgramCounter++]);
                 FloatRegisters[Destination] *= FloatRegisters[Source];
                 break;
             }
             case 0xD4: { // FDIV
-                int Destination = Memory[ProgramCounter++] - 16;
-                int Source = Memory[ProgramCounter++] - 16;
+                int Destination = DecodeRegister(Memory[ProgramCounter++]);
+                int Source = DecodeRegister(Memory[ProgramCounter++]);
                 if (FloatRegisters[Source] != 0.0f) FloatRegisters[Destination] /= FloatRegisters[Source];
                 else std::cerr << "Error: float division by zero" << std::endl;
                 break;
             }
             case 0xE0: { // DMOV
                 // Updated to Big Endian:
-                int Register = Memory[ProgramCounter++] - 24;
+                int Register = DecodeRegister(Memory[ProgramCounter++]);
                 uint64_t Bits = 0;
                 Bits |= (uint64_t)Memory[ProgramCounter++] << 56;
                 Bits |= (uint64_t)Memory[ProgramCounter++] << 48;
@@ -545,28 +545,89 @@ void JinXVM::Run() {
                 break;
             }
             case 0xE1: { // DADD
-                int Destination = Memory[ProgramCounter++] - 24;
-                int Source = Memory[ProgramCounter++] - 24;
+                int Destination = DecodeRegister(Memory[ProgramCounter++]);
+                int Source = DecodeRegister(Memory[ProgramCounter++]);
                 DoubleRegisters[Destination] += DoubleRegisters[Source];
                 break;
             }
             case 0xE2: { // DSUB
-                int Destination = Memory[ProgramCounter++] - 24;
-                int Source = Memory[ProgramCounter++] - 24;
+                int Destination = DecodeRegister(Memory[ProgramCounter++]);
+                int Source = DecodeRegister(Memory[ProgramCounter++]);
                 DoubleRegisters[Destination] -= DoubleRegisters[Source];
                 break;
             }
             case 0xE3: { // DMUL
-                int Destination = Memory[ProgramCounter++] - 24;
-                int Source = Memory[ProgramCounter++] - 24;
+                int Destination = DecodeRegister(Memory[ProgramCounter++]);
+                int Source = DecodeRegister(Memory[ProgramCounter++]);
                 DoubleRegisters[Destination] *= DoubleRegisters[Source];
                 break;
             }
             case 0xE4: { // DDIV
-                int Destination = Memory[ProgramCounter++] - 24;
-                int Source = Memory[ProgramCounter++] - 24;
+                int Destination = DecodeRegister(Memory[ProgramCounter++]);
+                int Source = DecodeRegister(Memory[ProgramCounter++]);
                 if (DoubleRegisters[Source] != 0.0) DoubleRegisters[Destination] /= DoubleRegisters[Source];
                 else std::cerr << "Error: double division by zero" << std::endl;
+                break;
+            }
+            case 0xF0: { // STORE
+                int HardRegister = Memory[ProgramCounter++];
+                int SourceEncoded = Memory[ProgramCounter++];
+                int SourceRegister = DecodeRegister(SourceEncoded);
+                int SourceType = GetRegisterType(SourceEncoded);
+                
+                long double Value = 0;
+                if (SourceType == 0) Value = TemporaryRegisters[SourceRegister];
+                else if (SourceType == 1) Value = Registers[SourceRegister];
+                else if (SourceType == 2) Value = FloatRegisters[SourceRegister];
+                else if (SourceType == 3) Value = DoubleRegisters[SourceRegister];
+                
+                HardRegisters[HardRegister] = Value;
+
+                std::cerr << "STORE: H" << HardRegister << " = " << (double)Value << std::endl;
+                
+                std::ofstream File("DataStorage");
+                if (!File) {
+                    std::cerr << "STORE: HardDrive.txt file not found!" << std::endl;
+                    std::cerr << "Error: " << strerror(errno) << std::endl;
+                    break;
+                }
+                File << HardRegister << " " << std::setprecision(20) << Value << std::endl;
+                File.flush();
+                File.close();
+                break;
+            }
+            case 0xF1: { // LOAD
+                int HardRegister = Memory[ProgramCounter++];
+                int DestinationEncoded = Memory[ProgramCounter++];
+                int DestinationRegister = DecodeRegister(DestinationEncoded);
+                int DestinationType = GetRegisterType(DestinationEncoded);
+                
+                std::ifstream File("DataStorage");
+                if (!File) {
+                    std::cerr << "LOAD: HardDrive.txt not found" << std::endl;
+                    break;
+                }
+                
+                int FoundHardRegister;
+                long double FoundValue;
+                bool Found = false;
+                
+                while (File >> FoundHardRegister >> FoundValue) {
+                    if (FoundHardRegister == HardRegister) {
+                        Found = true;
+                        break;
+                    }
+                }
+                File.close();
+                
+                if (!Found) break;
+                
+                HardRegisters[HardRegister] = FoundValue;
+                
+                if (DestinationType == 0) TemporaryRegisters[DestinationRegister] = (int32_t)FoundValue;
+                else if (DestinationType == 1) Registers[DestinationRegister] = (int32_t)FoundValue;
+                else if (DestinationType == 2) FloatRegisters[DestinationRegister] = (float)FoundValue;
+                else if (DestinationType == 3) DoubleRegisters[DestinationRegister] = (double)FoundValue;
                 break;
             }
             default: {
@@ -612,6 +673,7 @@ int JinXVM::DecodeRegister(int Encoded) {
     // R0 -> R7 found as 8 -> 15, 
     // F0 -> F7 found as 16 -> 23,
     // D0 -> D7 found as 24 -> 31
+    // H0 -> H7 found as 32 -> 39
 
     if (Encoded >= 0 && Encoded <= 7) {
         return Encoded;
@@ -621,7 +683,19 @@ int JinXVM::DecodeRegister(int Encoded) {
         return Encoded - 16;
     } else if (Encoded >= 24 && Encoded <= 31) {
         return Encoded - 24;
+    } else if (Encoded >= 32 && Encoded <= 39) {
+        return Encoded - 32;
+    } else {
+        std::cerr << "Error: invalid register encoding" << std::endl;
     }
 
     return 0;
+}
+
+int JinXVM::GetRegisterType(int Encoded) {
+    if (Encoded >= 0 && Encoded <= 7) return 0;   // X
+    if (Encoded >= 8 && Encoded <= 15) return 1;  // R
+    if (Encoded >= 16 && Encoded <= 23) return 2; // F
+    if (Encoded >= 24 && Encoded <= 31) return 3; // D
+    return -1;
 }

@@ -1,5 +1,4 @@
-#ifndef JINX_VIRTUAL_H
-#define JINX_VIRTUAL_H
+#pragma once
 
 #if defined(__APPLE__) || defined(__linux__)
     #include <sys/select.h>
@@ -25,6 +24,7 @@ class JinXVM {
         float FloatRegisters[8];
         double DoubleRegisters[8];
         int32_t TemporaryRegisters[8];
+        long double HardRegisters[8];
     public:
         JinXVM(int Size);
         ~JinXVM();
@@ -35,6 +35,5 @@ class JinXVM {
         void SetProgramCounter(int Address);
         bool LoadFromFile(const char* Filename);
         int DecodeRegister(int Encoded);
+        int GetRegisterType(int Encoded);
 };
-
-#endif
